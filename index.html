@@ -7,45 +7,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <header>
-        <nav class="navbar">
-            <div class="logo">Bédia</div>
-            <div class="menu-toggle" id="mobile-menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+    <header class="main-banner">
+        <div class="banner-content">
+            <span class="status">Destaque</span>
+            <h1>Bédia Quadrinhos</h1>
+            <p>O universo dos novos mangakás independentes.</p>
+            <div class="actions">
+                <a href="#listaMangas" class="btn-read" style="text-decoration: none; display: inline-block;">Ler agora</a>
+                <a href="https://wa.me/teunumeroaqui" class="btn-list" style="text-decoration: none;">+</a>
             </div>
-            <ul class="nav-list">
-                <li><a href="#">Início</a></li>
-                <li><a href="#listaMangas">Mangás</a></li>
-                <li><a href="https://wa.me/seunumeroaqui">Enviar Obra</a></li>
-            </ul>
-        </nav>
+        </div>
     </header>
 
-    <main>
-        <section class="hero">
-            <div class="hero-content">
-                <h1>Bédia Quadrinhos</h1>
-                <p>A tua plataforma interativa de mangás e BDs.</p>
-                <div class="hero-btns">
-                    <a href="#listaMangas" class="btn-read" style="text-decoration: none; display: inline-block;">Ler agora</a>
-                    <button class="btn-add">+</button>
-                </div>
+    <section class="content-section">
+        <div class="section-header">
+            <h2>Últimos Capítulos</h2>
+            <a href="https://wa.me/teunumeroaqui" class="view-more">Enviar Obra</a>
+        </div>
+        <div id="listaMangas" class="manga-grid">
             </div>
-        </section>
-
-        <section class="mangas-section">
-            <div class="section-header">
-                <h2>Últimos Capítulos</h2>
-                <a href="#" class="view-more">ver mais</a>
-            </div>
-            
-            <div id="listaMangas" class="manga-grid">
-                </div>
-        </section>
-    </main>
+    </section>
 
     <script src="script.js"></script>
 </body>
