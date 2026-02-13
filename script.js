@@ -1,23 +1,24 @@
-// Lista de capítulos do mangá 20 SOBRE LOVE
-const capítulos = [
-    { nome: "Capítulo 01", arquivo: "20 SOBRE LOVE - 01.pdf" },
-    { nome: "Capítulo 02", arquivo: "20 SOBRE LOVE - 02.pdf" },
-    { nome: "Capítulo 03", arquivo: "20 SOBRE LOVE - 03_compressed.pdf" }, // Nome atualizado conforme a foto
-    { nome: "Capítulo 04", arquivo: "20 SOBRE LOVE - 04.pdf" },
-    { nome: "Capítulo 05", arquivo: "20 SOBRE LOVE - 05.pdf" },
-    { nome: "Capítulo 05.5", arquivo: "20 SOBRE LOVE - 05.5.pdf" },
-    { nome: "Capítulo 06", arquivo: "20 SOBRE LOVE - 06.pdf" },
-    { nome: "Capítulo 06.5", arquivo: "20 SOBRE LOVE - 06.5.pdf" },
-    { nome: "Capítulo 07", arquivo: "20 SOBRE LOVE - 07.pdf" }
+// 1. LISTA DE MANGÁS (Adiciona aqui os teus volumes novos)
+const capitulos = [
+    { 
+        nome: "20 SOBRE LOVE - Vol 1", 
+        arquivo: "20_SOBRE_LOVE_VOL_1.pdf", // Confirma se o nome do PDF no GitHub é este
+        capa: "capa.jpeg" 
+    },
+    { 
+        nome: "Volume Novo", 
+        arquivo: "NOME_DO_TEU_NOVO_PDF.pdf", 
+        capa: "capa.jpeg" 
+    }
 ];
 
-const listaElement = document.getElementById('lista-capitulos');
+// 2. MOSTRAR OS MANGÁS NO SITE
+// CORREÇÃO: O ID tem de ser 'listaMangas' igual ao HTML
+const container = document.getElementById('listaMangas');
 
-// Função para gerar a lista no site
-capítulos.forEach(cap => {
-    const li = document.createElement('li');
-    li.innerHTML = <a href="${cap.arquivo}" target="_blank">${cap.nome}</a>;
-    listaElement.appendChild(li);
-});
-
-console.log("Portal Bédia carregado com sucesso!");
+if (container) {
+    capitulos.forEach(cap => {
+        const mangaCard = document.createElement('div');
+        mangaCard.className = 'manga-card';
+        mangaCard.innerHTML = `
+            <img src="${cap.capa}" alt="${cap.nome}" style="width: 1…

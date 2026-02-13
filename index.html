@@ -3,38 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bédia - Portal de Mangás</title>
+    <title>Bédia Quadrinhos</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="logo">BÉDIA</div>
-        <div class="menu-icon">☰</div>
-    </nav>
-
-    <header class="main-banner" style="background-image: linear-gradient(to top, #0b0e11, transparent), url('Bedia.jpeg');">
-        <div class="banner-content">
-            <span class="status">Destaque</span>
-            <h1>Bédia Quadrinhos</h1>
-            <p>O universo dos novos mangakás independentes.</p>
-            <div class="actions">
-                <a href="#listaMangas" class="btn-read" style="text-decoration: none; display: inline-block;">Ler agora</a>
-                <button class="btn-list">+</button>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Bédia</div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
             </div>
-        </div>
+            <ul class="nav-list">
+                <li><a href="#">Início</a></li>
+                <li><a href="#listaMangas">Mangás</a></li>
+                <li><a href="https://wa.me/seunumeroaqui">Enviar Obra</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <section class="content-section">
-        <div class="section-header">
-            <h2>Últimos Capítulos</h2>
-            <a href="#" class="view-more">ver mais</a>
-        </div>
-        
-        <div id="listaMangas" class="manga-grid">
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Bédia Quadrinhos</h1>
+                <p>A tua plataforma interativa de mangás e BDs.</p>
+                <div class="hero-btns">
+                    <a href="#listaMangas" class="btn-read" style="text-decoration: none; display: inline-block;">Ler agora</a>
+                    <button class="btn-add">+</button>
+                </div>
             </div>
-    </section>
+        </section>
+
+        <section class="mangas-section">
+            <div class="section-header">
+                <h2>Últimos Capítulos</h2>
+                <a href="#" class="view-more">ver mais</a>
+            </div>
+            
+            <div id="listaMangas" class="manga-grid">
+                </div>
+        </section>
+    </main>
 
     <script src="script.js"></script>
 </body>
