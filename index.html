@@ -7,25 +7,29 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <nav class="navbar">
+        <div class="logo">BÉDIA</div>
+        <div class="menu-icon">☰</div>
+    </nav>
+
     <header class="main-banner">
         <div class="banner-content">
-            <span class="status">Destaque</span>
+            <span class="status-tag">Destaque</span>
             <h1>Bédia Quadrinhos</h1>
             <p>O universo dos novos mangakás independentes.</p>
             <div class="actions">
-                <a href="#listaMangas" class="btn-read" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">Ler agora</a>
-                <button class="btn-list">+</button>
+                <a href="#listaMangas" class="btn-primary">Ler agora</a>
+                <button class="btn-secondary">+</button>
             </div>
         </div>
     </header>
 
-    <section class="content-section">
+    <section class="content-section" id="listaMangas">
         <div class="section-header">
-            <h2>Últimos Capítulos</h2>
-            <a href="https://wa.me/seunumeroaqui" class="view-more">Enviar Obra</a>
+            <h2>Últimas Obras</h2>
+            <span class="view-all">ver mais</span>
         </div>
-        <div id="listaMangas" class="manga-grid">
-            </div>
+        <div id="mangaGrid" class="manga-grid"></div>
     </section>
 
     <script src="script.js"></script>
