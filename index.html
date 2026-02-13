@@ -9,8 +9,15 @@
 <body>
     <nav class="navbar">
         <div class="logo">BÉDIA</div>
-        <div class="menu-icon">☰</div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
     </nav>
+
+    <div id="sideMenu" class="side-menu">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
+        <a href="#">Início</a>
+        <a href="#listaMangas">Mangás</a>
+        <a href="https://wa.me/seunumerodewhatsapp">Contacto</a>
+    </div>
 
     <header class="main-banner">
         <div class="banner-content">
@@ -19,7 +26,7 @@
             <p>O universo dos novos mangakás independentes.</p>
             <div class="actions">
                 <a href="#listaMangas" class="btn-primary">Ler agora</a>
-                <button class="btn-secondary">+</button>
+                <a href="https://wa.me/seunumerodewhatsapp?text=Olá, quero enviar uma obra!" class="btn-secondary">+</a>
             </div>
         </div>
     </header>
@@ -27,10 +34,17 @@
     <section class="content-section" id="listaMangas">
         <div class="section-header">
             <h2>Últimas Obras</h2>
-            <span class="view-all">ver mais</span>
         </div>
         <div id="mangaGrid" class="manga-grid"></div>
     </section>
+
+    <div id="chapterModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">Escolha o Capítulo</h3>
+            <div id="chapterList" class="chapter-list"></div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

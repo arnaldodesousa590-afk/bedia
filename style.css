@@ -1,54 +1,46 @@
-/* Reset básico para não bugar em nenhum navegador */
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+body { background-color: #0b0b0b; color: white; }
 
-body { background-color: #0b0b0b; color: white; line-height: 1.6; }
-
-/* Navbar Superior Vermelha */
+/* Navbar Transparente com Letra Vermelha */
 .navbar {
-    background-color: #ff0000;
-    height: 60px;
+    background-color: transparent;
+    height: 70px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
-    position: sticky;
-    top: 0;
+    padding: 0 25px;
+    position: absolute; /* Para ficar por cima do banner */
+    width: 100%;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
-.logo { font-size: 24px; font-weight: 900; letter-spacing: 1px; }
+.logo { font-size: 28px; font-weight: 900; color: #ff0000; letter-spacing: 2px; }
+.menu-icon { font-size: 30px; color: white; cursor: pointer; }
 
-/* Banner Principal */
+/* Menu Lateral */
+.side-menu {
+    height: 100%; width: 0; position: fixed; z-index: 2000; top: 0; right: 0;
+    background-color: #111; overflow-x: hidden; transition: 0.5s; padding-top: 60px;
+}
+.side-menu a { padding: 8px 32px; text-decoration: none; font-size: 20px; color: white; display: block; transition: 0.3s; }
+.side-menu .closebtn { position: absolute; top: 0; right: 25px; font-size: 36px; }
+
+/* Banner */
 .main-banner {
-    height: 75vh;
-    background: linear-gradient(rgba(0,0,0,0.6), #0b0b0b), url('Bedia.jpeg');
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: center;
-    padding: 20px;
+    height: 80vh;
+    background: linear-gradient(rgba(0,0,0,0.5), #0b0b0b), url('Bedia.jpeg');
+    background-size: cover; background-position: center;
+    display: flex; align-items: center; padding: 20px;
 }
-.banner-content { max-width: 500px; }
-.status-tag { background: #ff4500; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-h1 { font-size: 3rem; margin: 10px 0; line-height: 1.1; }
+.btn-primary { background: #ff0000; color: white; padding: 12px 25px; text-decoration: none; font-weight: bold; border-radius: 5px; }
+.btn-secondary { background: #333; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 20px; }
 
-/* Botões */
-.actions { display: flex; gap: 15px; margin-top: 20px; }
-.btn-primary { 
-    background: #ff0000; color: white; padding: 12px 25px; 
-    text-decoration: none; font-weight: bold; border-radius: 5px; 
-}
-.btn-secondary { background: rgba(255,255,255,0.1); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+/* Modal de Capítulos */
+.modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); }
+.modal-content { background-color: #1a1a1a; margin: 15% auto; padding: 20px; border-radius: 10px; width: 80%; max-width: 400px; text-align: center; }
+.chapter-list a { display: block; background: #333; color: white; padding: 10px; margin: 10px 0; text-decoration: none; border-radius: 5px; }
+.chapter-list a:hover { background: #ff0000; }
+.close-modal { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
 
-/* Grid de Mangás (Visual de Capas) */
-.content-section { padding: 40px 20px; }
-.section-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-.manga-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-    gap: 20px; 
-}
-.manga-card { cursor: pointer; transition: transform 0.3s; }
-.manga-card:hover { transform: translateY(-5px); }
-.manga-card img { width: 100%; border-radius: 8px; border: 1px solid #333; }
-.manga-card p { margin-top: 10px; font-weight: bold; text-align: center; }
+/* Grid */
+.manga-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 20px; }
+.manga-card img { width: 100%; border-radius: 8px; cursor: pointer; }
