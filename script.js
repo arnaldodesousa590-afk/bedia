@@ -1,65 +1,52 @@
-document.addEventListener("DOMContentLoaded", function() {
-    // 1. Capítulos
-    const capitulos = [
-        { n: "Capítulo 01", l: "20 SOBRE LOVE - 01.pdf" },
-        { n: "Capítulo 02", l: "20 SOBRE LOVE - 02.pdf" },
-        { n: "Capítulo 03", l: "20 SOBRE LOVE - 03_compressed.pdf" },
-        { n: "Capítulo 04", l: "20 SOBRE LOVE - 04.pdf" },
-        { n: "Capítulo 05", l: "20 SOBRE LOVE - 05.pdf" },
-        { n: "Capítulo 05.5", l: "20 SOBRE LOVE - 05.5.pdf" },
-        { n: "Capítulo 06", l: "20 SOBRE LOVE - 06.pdf" },
-        { n: "Capítulo 06.5", l: "20 SOBRE LOVE - 06.5.pdf" },
-        { n: "Capítulo 07", l: "20 SOBRE LOVE - 07.pdf" }
-    ];
+// 1. Configurações da tua Bédia-DB
+const SB_URL = "https://vskczoxyspfyjeuyffbl.supabase.co";
+const SB_KEY = "sb_publishable_PMTgG1tjs9LLOGk6lv6_fA_MkErLXJe";
 
-    const menu = document.getElementById("sideMenu");
-    const modal = document.getElementById("chapterModal");
-    const grid = document.getElementById("mangaGrid");
-    const listaDiv = document.getElementById("chapterList");
-
-    // 2. Menu Lateral
-    document.getElementById("btnAbrirMenu").addEventListener("click", () => menu.style.width = "250px");
-    document.getElementById("btnFecharMenu").addEventListener("click", () => menu.style.width = "0");
-
-    // 3. Abrir Janela e Listar Capítulos
-    function abrirModal() {
-        modal.style.display = "flex";
-        listaDiv.innerHTML = "";
-        capitulos.forEach(cap => {
-            const a = document.createElement("a");
-            a.href = cap.l;
-            a.target = "_blank";
-            a.className = "chapter-btn";
-            a.innerText = cap.n;
-            listaDiv.appendChild(a);
+// 2. Função para carregar os likes quando o site abre
+async function carregarLikes() {
+    try {
+        const resposta = await fetch(`${SB_URL}/rest/v1/interacoes?obra_nome=eq.20%20SOBRE%20LOVE`, {
+            headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` }
         });
+        const dados = await resposta.json();
+        
+        if (dados.length > 0) {
+            document.getElementById('contagem-likes').innerText = dados[0].like;
+        }
+    } catch (erro) {
+        console.error("Erro ao carregar:", erro);
     }
+}
 
-    // 4. Fechar Janela
-    document.getElementById("btnFecharJanela").addEventListener("click", () => modal.style.display = "none");
-    window.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
+// 3. Função para dar Like quando clicas no coração
+async function darLike() {
+    try {
+        // Primeiro, vamos ver quantos likes existem agora
+        const resposta = await fetch(`${SB_URL}/rest/v1/interacoes?obra_nome=eq.20%20SOBRE%20LOVE`, {
+            headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` }
+        });
+        const dados = await resposta.json();
+        let likesAtuais = dados[0].like;
 
-    // 5. Like
-    let likes = 0;
-    const btnLike = document.getElementById("likeBtn");
-    btnLike.addEventListener("click", () => {
-        likes++;
-        document.getElementById("likeCount").innerText = likes;
-        btnLike.style.color = "#ff0000";
-    });
+        // Segundo, somamos +1 e enviamos para o Supabase
+        await fetch(`${SB_URL}/rest/v1/interacoes?obra_nome=eq.20%20SOBRE%20LOVE`, {
+            method: 'PATCH',
+            headers: { 
+                "apikey": SB_KEY, 
+                "Authorization": `Bearer ${SB_KEY}`,
+                "Content-Type": "application/json",
+                "Prefer": "return=representation"
+            },
+            body: JSON.stringify({ like: likesAtuais + 1 })
+        });
 
-    // 6. Criar Capa na Tela
-    if (grid) {
-        const card = document.createElement("div");
-        card.className = "manga-card";
-        card.innerHTML = `<img src="capa.jpeg" alt="Capa"><p>20 SOBRE LOVE</p>`;
-        card.addEventListener("click", abrirModal);
-        grid.appendChild(card);
+        // Atualiza o número no teu site
+        document.getElementById('contagem-likes').innerText = likesAtuais + 1;
+        
+    } catch (erro) {
+        alert("Erro ao guardar o like!");
     }
+}
 
-    // 7. Motor de Comentários (Disqus)
-    var d = document, s = d.createElement('script');
-    s.src = 'https://bedia-quadrinhos.disqus.com/embed.js'; 
-    s.setAttribute('data-timestamp', +new Date());
-    (d.head || d.body).appendChild(s);
-});
+// Inicia o site carregando os likes da base de dados
+carregarLikes();
