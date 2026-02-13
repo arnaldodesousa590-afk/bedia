@@ -1,55 +1,21 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bédia Quadrinhos</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <nav class="navbar">
-        <div class="logo">BÉDIA</div>
-        <div class="menu-icon" id="btnAbrirMenu">☰</div>
-    </nav>
+<div id="chapterModal" class="modal">
+    <div class="modal-content">
+        <span id="btnFecharJanela" class="close">&times;</span>
+        <h2 id="modalTitle">Capítulos</h2>
+        <div id="chapterList"></div>
 
-    <div id="sideMenu" class="side-menu">
-        <span class="closebtn" id="btnFecharMenu">&times;</span>
-        <a href="#">Início</a>
-        <a href="#listaMangas">Mangás</a>
-        <a href="https://wa.me/seunumerode_whatsapp">Enviar Obra</a>
-    </div>
-
-    <header class="main-banner">
-        <div class="banner-content">
-            <span class="status-tag">Destaque</span>
-            <h1>Bédia Quadrinhos</h1>
-            <p class="banner-description">O universo dos novos mangakás independentes.</p>
-            <div class="actions">
-                <a href="#listaMangas" class="btn-primary">Ler agora</a>
-                <a href="https://wa.me/seunumerode_whatsapp" class="btn-plus">+</a>
-            </div>
+        <hr>
+        <div class="interacao">
+            <button id="likeBtn">👍 <span id="likeCount">0</span></button>
+            <button id="dislikeBtn">👎 <span id="dislikeCount">0</span></button>
         </div>
-    </header>
 
-    <section class="content-section" id="listaMangas">
-        <h2>Últimas Obras</h2>
-        <div id="mangaGrid" class="manga-grid"></div>
-    </section>
-
-    <div id="chapterModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" id="btnFecharJanela">&times;</span>
-            <h3>20 SOBRE LOVE</h3>
-            <div id="chapterList"></div>
-            <div class="interact-bar">
-                <button id="likeBtn" class="like-btn">❤️ <span id="likeCount">0</span></button>
-            </div>
-            <div class="comments-area">
-                <div id="disqus_thread"></div>
-            </div>
+        <div class="comentarios">
+            <h3>Comentários</h3>
+            <div id="listaComentarios" style="text-align:left; max-height:150px; overflow-y:auto;"></div>
+            <input type="text" id="nomeUser" placeholder="Teu nome..." style="width:90%">
+            <textarea id="textoMsg" placeholder="Escreve aqui..." style="width:90%"></textarea>
+            <button id="enviarComentBtn">Enviar</button>
         </div>
     </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
+</div>
