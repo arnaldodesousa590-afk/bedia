@@ -1,0 +1,141 @@
+/* Cores do Leviatan HQs */
+:root {
+    --bg-color: #0b0e11;
+    --card-bg: #1c1e21;
+    --primary-red: #ff103f;
+    --text-main: #ffffff;
+    --text-dim: #b0b3b8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+    padding: 20px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(11, 14, 17, 0.9);
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+}
+
+.logo {
+    color: var(--primary-red);
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+}
+
+/* Banner */
+.main-banner {
+    height: 70vh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 5% 60px 5%;
+}
+
+.banner-content h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin: 10px 0;
+}
+
+.status {
+    background: var(--primary-red);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn-read {
+    background: var(--primary-red);
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Grid de Mangás */
+.content-section {
+    padding: 40px 5%;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-left: 5px solid var(--primary-red);
+    padding-left: 15px;
+}
+
+.manga-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+}
+
+/* Card igual ao do vídeo (com o número grande) */
+.card-manga {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.card-manga:hover {
+    transform: translateY(-8px);
+}
+
+.capa-manga {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.ranking-num {
+    position: absolute;
+    bottom: 40px;
+    left: 5px;
+    font-size: 4rem;
+    font-weight: 900;
+    color: white;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+    line-height: 1;
+}
+
+.info-manga h3 {
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+.view-more {
+    color: var(--primary-red);
+    text-decoration: none;
+    font-weight: bold;
+}
