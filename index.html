@@ -1,31 +1,55 @@
-<div id="chapterModal" class="modal">
-    <div class="modal-content bedia-modal">
-        <div class="modal-header">
-            <h2>Capítulos</h2>
-            <span id="btnFecharJanela" class="close-icon">&times;</span>
-        </div>
-        
-        <div id="chapterList" class="chapter-grid"></div>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bédia - 20 Sobre Love</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-        <div class="bedia-divider"></div>
+    <div id="sideMenu" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" id="btnFecharMenu">&times;</a>
+        <a href="#">Início</a>
+        <a href="#">Mangás</a>
+        <a href="#">Sobre</a>
+    </div>
+    <span id="btnAbrirMenu" style="font-size:30px;cursor:pointer;color:white;padding:20px;">&#9776; Menu</span>
 
-        <div class="interaction-section">
-            <div class="votos-pill">
-                <button id="likeBtn" class="pill-btn">👍 <span id="likeCount">0</span></button>
-                <div class="pill-divider"></div>
-                <button id="dislikeBtn" class="pill-btn">👎 <span id="dislikeCount">0</span></button>
+    <div class="container">
+        <div id="mangaGrid" class="manga-grid">
+            <div class="manga-card" onclick="abrirModal()">
+                <img src="capa.jpeg" alt="Capa 20 Sobre Love" id="mangaCapa">
+                <p>20 SOBRE LOVE</p>
             </div>
+        </div>
+    </div>
 
-            <div class="comments-container">
-                <h3>Comentários</h3>
-                <div id="listaComentarios" class="comments-feed"></div>
+    <div id="chapterModal" class="modal">
+        <div class="modal-content">
+            <span id="btnFecharJanela" class="close">&times;</span>
+            <h2>Capítulos</h2>
+            
+            <div id="chapterList" class="chapter-list"></div>
+
+            <hr class="linha-separadora">
+
+            <div class="interacao-box">
+                <div class="votos">
+                    <button id="likeBtn">👍 <span id="likeCount">0</span></button>
+                    <button id="dislikeBtn">👎 <span id="dislikeCount">0</span></button>
+                </div>
                 
-                <div class="comment-input-area">
+                <div class="comentarios-area">
+                    <div id="listaComentarios" class="comentarios-feed"></div>
                     <input type="text" id="nomeUser" placeholder="Teu nome...">
-                    <textarea id="textoMsg" placeholder="Escreve um comentário..."></textarea>
-                    <button id="enviarComentBtn" class="send-btn">Publicar Comentário</button>
+                    <textarea id="textoMsg" placeholder="Comenta algo..."></textarea>
+                    <button id="enviarComentBtn">Enviar</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    <script src="script.js"></script>
+</body>
+</html>

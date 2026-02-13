@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Configurações da Bédia-DB
     const SB_URL = "https://vskczoxyspfyjeuyffbl.supabase.co";
     const SB_KEY = "sb_publishable_PMTgG1tjs9lLO6k6lV6_fA_MkErLXJe";
 
@@ -15,10 +14,8 @@ document.addEventListener("DOMContentLoaded", function() {
         { n: "Capítulo 07", l: "20 SOBRE LOVE - 07.pdf" }
     ];
 
-    // Função para carregar Likes e Comentários
-    async function carregarDadosDB() {
+    async function carregarDB() {
         try {
-            // Busca Votos
             const resV = await fetch(`${SB_URL}/rest/v1/interacoes?obra_nome=eq.20%20SOBRE%20LOVE`, {
                 headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` }
             });
@@ -28,94 +25,57 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById("dislikeCount").innerText = dadosV[0].dislikes || 0;
             }
 
-            // Busca Comentários
             const resC = await fetch(`${SB_URL}/rest/v1/comentarios_bedia?obra_nome=eq.20%20SOBRE%20LOVE&order=created_at.desc`, {
                 headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` }
             });
             const coments = await resC.json();
-            const lista = document.getElementById("listaComentarios");
-            lista.innerHTML = coments.map(c => 
-                `<div style="margin-bottom:8px; border-bottom:1px solid #222; padding-bottom:4px;">
-                    <b style="color:#ff4d4d;">${c.leitor_nome}:</b> <span style="color:#ccc;">${c.mensagem}</span>
-                </div>`
+            document.getElementById("listaComentarios").innerHTML = coments.map(c => 
+                `<p><b>${c.leitor_nome}:</b> ${c.mensagem}</p>`
             ).join('');
-        } catch (err) {
-            console.error("Erro ao conectar com a Bédia-DB:", err);
-        }
+        } catch (e) { console.error("Erro na base de dados"); }
     }
 
-    // Função para Abrir o Modal (Acionada pela capa do mangá)
     window.abrirModal = function() {
-        const modal = document.getElementById("chapterModal");
+        document.getElementById("chapterModal").style.display = "flex";
         const lista = document.getElementById("chapterList");
-        
-        modal.style.display = "flex";
-        lista.innerHTML = ""; // Limpa para não duplicar
-
+        lista.innerHTML = "";
         capitulos.forEach(cap => {
             const a = document.createElement("a");
             a.href = cap.l;
             a.target = "_blank";
-            a.className = "chapter-btn"; // Usa a classe do teu CSS
+            a.className = "chapter-btn";
             a.innerText = cap.n;
             lista.appendChild(a);
         });
-
-        carregarDadosDB();
+        carregarDB();
     };
 
-    // Sistema de Votos Corrigido
-    async function processarVoto(coluna) {
-        let labelId = coluna === 'like' ? "likeCount" : "dislikeCount";
-        let span = document.getElementById(labelId);
-        let novoValor = parseInt(span.innerText) + 1;
+    document.getElementById("btnFecharJanela").onclick = () => document.getElementById("chapterModal").style.display = "none";
 
-        // Na tua DB, a coluna do dislike chama-se 'dislikes' (com S no final)
-        const payload = {};
-        payload[coluna] = novoValor;
+    document.getElementById("likeBtn").onclick = () => votar('like');
+    document.getElementById("dislikeBtn").onclick = () => votar('dislikes');
 
+    async function votar(tipo) {
+        let span = document.getElementById(tipo === 'like' ? 'likeCount' : 'dislikeCount');
+        let novo = parseInt(span.innerText) + 1;
         await fetch(`${SB_URL}/rest/v1/interacoes?obra_nome=eq.20%20SOBRE%20LOVE`, {
             method: 'PATCH',
-            headers: { 
-                "apikey": SB_KEY, 
-                "Authorization": `Bearer ${SB_KEY}`,
-                "Content-Type": "application/json" 
-            },
-            body: JSON.stringify(payload)
+            headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ [tipo]: novo })
         });
-        span.innerText = novoValor;
+        span.innerText = novo;
     }
 
-    // Eventos dos Botões
-    document.getElementById("likeBtn").onclick = () => processarVoto('like');
-    document.getElementById("dislikeBtn").onclick = () => processarVoto('dislikes');
-
     document.getElementById("enviarComentBtn").onclick = async () => {
-        const nomeInput = document.getElementById("nomeUser");
-        const msgInput = document.getElementById("textoMsg");
-        
-        if (!msgInput.value.trim()) return alert("Escreve uma mensagem!");
-
+        const nome = document.getElementById("nomeUser").value || "Anónimo";
+        const msg = document.getElementById("textoMsg").value;
+        if (!msg) return;
         await fetch(`${SB_URL}/rest/v1/comentarios_bedia`, {
             method: 'POST',
-            headers: { 
-                "apikey": SB_KEY, 
-                "Authorization": `Bearer ${SB_KEY}`,
-                "Content-Type": "application/json" 
-            },
-            body: JSON.stringify({
-                obra_nome: "20 SOBRE LOVE",
-                leitor_nome: nomeInput.value || "Anónimo",
-                mensagem: msgInput.value
-            })
+            headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ obra_nome: "20 SOBRE LOVE", leitor_nome: nome, mensagem: msg })
         });
-
-        msgInput.value = "";
-        carregarDadosDB();
-    };
-
-    // Fechar Modal
-    document.getElementById("btnFecharJanela").onclick = () => {
-        document.getElementById("chapterModal").style.display = "none";
+        document.getElementById("textoMsg").value = "";
+        carregarDB();
     };
 });
