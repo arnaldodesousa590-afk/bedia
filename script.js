@@ -1,5 +1,9 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Capítulos
+    // 1. Configurações da Bédia-DB (Supabase)
+    const SB_URL = "https://vskczoxyspfyjeuyffbl.supabase.co";
+    const SB_KEY = "sb_publishable_PMTgG1tjs9lLO6k6lV6_fA_MkErLXJe"; // Tua chave da foto
+
+    // 2. Lista de Capítulos (Mantendo os teus dados originais)
     const capitulos = [
         { n: "Capítulo 01", l: "20 SOBRE LOVE - 01.pdf" },
         { n: "Capítulo 02", l: "20 SOBRE LOVE - 02.pdf" },
@@ -12,16 +16,16 @@ document.addEventListener("DOMContentLoaded", function() {
         { n: "Capítulo 07", l: "20 SOBRE LOVE - 07.pdf" }
     ];
 
+    // Seleção de Elementos do HTML
     const menu = document.getElementById("sideMenu");
     const modal = document.getElementById("chapterModal");
     const grid = document.getElementById("mangaGrid");
     const listaDiv = document.getElementById("chapterList");
+    const likeCountLabel = document.getElementById("likeCount");
 
-    // 2. Menu Lateral
-    document.getElementById("btnAbrirMenu").addEventListener("click", () => menu.style.width = "250px");
-    document.getElementById("btnFecharMenu").addEventListener("click", () => menu.style.width = "0");
+    // --- FUNÇÕES DO SISTEMA ---
 
-    // 3. Abrir Janela e Listar Capítulos
+    // Abrir Modal e Listar Capítulos
     function abrirModal() {
         modal.style.display = "flex";
         listaDiv.innerHTML = "";
@@ -35,20 +39,48 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // 4. Fechar Janela
+    // Menu Lateral (Abrir/Fechar)
+    document.getElementById("btnAbrirMenu").addEventListener("click", () => menu.style.width = "250px");
+    document.getElementById("btnFecharMenu").addEventListener("click", () => menu.style.width = "0");
+
+    // Fechar Janela Modal
     document.getElementById("btnFecharJanela").addEventListener("click", () => modal.style.display = "none");
     window.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
 
-    // 5. Like
-    let likes = 0;
-    const btnLike = document.getElementById("likeBtn");
-    btnLike.addEventListener("click", () => {
-        likes++;
-        document.getElementById("likeCount").innerText = likes;
-        btnLike.style.color = "#ff0000";
-    });
+    // --- LIGAÇÃO REAL COM A BASE DE DATA (LIKES) ---
 
-    // 6. Criar Capa na Tela
+    async function carregarLikes() {
+        try {
+            const res = await fetch(`${SB_URL}/rest/v1/interacoes?obra_nome=eq.20%20SOBRE%20LOVE`, {
+                headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` }
+            });
+            const dados = await res.json();
+            if (dados.length > 0) {
+                likeCountLabel.innerText = dados[0].like; // Usa o nome 'like' da tua tabela
+            }
+        } catch (err) { console.error("Erro ao carregar likes:", err); }
+    }
+
+    async function adicionarLike() {
+        let atual = parseInt(likeCountLabel.innerText);
+        let novo = atual + 1;
+
+        await fetch(`${SB_URL}/rest/v1/interacoes?obra_nome=eq.20%20SOBRE%20LOVE`, {
+            method: 'PATCH',
+            headers: { 
+                "apikey": SB_KEY, 
+                "Authorization": `Bearer ${SB_KEY}`,
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify({ like: novo })
+        });
+        likeCountLabel.innerText = novo;
+        document.getElementById("likeBtn").style.color = "#ff0000";
+    }
+
+    document.getElementById("likeBtn").addEventListener("click", adicionarLike);
+
+    // --- CRIAÇÃO DA CAPA NA TELA ---
     if (grid) {
         const card = document.createElement("div");
         card.className = "manga-card";
@@ -57,9 +89,6 @@ document.addEventListener("DOMContentLoaded", function() {
         grid.appendChild(card);
     }
 
-    // 7. Motor de Comentários (Disqus)
-    var d = document, s = d.createElement('script');
-    s.src = 'https://bedia-quadrinhos.disqus.com/embed.js'; 
-    s.setAttribute('data-timestamp', +new Date());
-    (d.head || d.body).appendChild(s);
+    // Iniciar
+    carregarLikes();
 });
