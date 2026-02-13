@@ -1,14 +1,17 @@
-// 1. Dados da Obra (Garante que os nomes dos PDFs batem com o GitHub)
-const obra = {
-    titulo: "20 SOBRE LOVE",
-    capa: "capa.jpeg",
-    capitulos: [
-        { nome: "Capítulo 1", link: "20 SOBRE LOVE - 01.pdf" },
-        { nome: "Capítulo 2", link: "20 SOBRE LOVE - 02.pdf" }
-    ]
-};
+// 1. LISTA DE CAPÍTULOS
+const listaCapitulos = [
+    { n: "Capítulo 01", l: "20 SOBRE LOVE - 01.pdf" },
+    { n: "Capítulo 02", l: "20 SOBRE LOVE - 02.pdf" },
+    { n: "Capítulo 03", l: "20 SOBRE LOVE - 03_compressed.pdf" },
+    { n: "Capítulo 04", l: "20 SOBRE LOVE - 04.pdf" },
+    { n: "Capítulo 05", l: "20 SOBRE LOVE - 05.pdf" },
+    { n: "Capítulo 05.5", l: "20 SOBRE LOVE - 05.5.pdf" },
+    { n: "Capítulo 06", l: "20 SOBRE LOVE - 06.pdf" },
+    { n: "Capítulo 06.5", l: "20 SOBRE LOVE - 06.5.pdf" },
+    { n: "Capítulo 07", l: "20 SOBRE LOVE - 07.pdf" }
+];
 
-// 2. Funções do Menu Lateral (Os 3 traços)
+// 2. FUNÇÃO DO MENU (3 TRAÇOS)
 function toggleMenu() {
     const menu = document.getElementById("sideMenu");
     if (menu) {
@@ -16,53 +19,58 @@ function toggleMenu() {
     }
 }
 
-// 3. Funções da Janela de Capítulos (Modal)
-function openModal() {
+// 3. FUNÇÕES DA JANELA (MODAL)
+function abrirJanela() {
     const modal = document.getElementById('chapterModal');
-    const list = document.getElementById('chapterList');
+    const listaDiv = document.getElementById('chapterList');
     
-    if (modal && list) {
-        modal.style.display = "flex"; // Usa flex para centralizar melhor
-        list.innerHTML = ""; // Limpa para não acumular botões
+    if (modal && listaDiv) {
+        modal.style.display = "flex";
+        listaDiv.innerHTML = ""; // Limpa antes de carregar
         
-        obra.capitulos.forEach(cap => {
-            const btn = document.createElement('a');
-            btn.href = cap.link;
-            btn.target = "_blank";
-            btn.className = "chapter-button"; // Classe para estilizar no CSS
-            btn.innerText = cap.nome;
-            list.appendChild(btn);
+        listaCapitulos.forEach(cap => {
+            const botao = document.createElement('a');
+            botao.href = cap.l;
+            botao.target = "_blank";
+            botao.className = "chapter-btn";
+            botao.innerText = cap.n;
+            listaDiv.appendChild(botao);
         });
     }
 }
 
-function closeModal() {
+function fecharJanela() {
     const modal = document.getElementById('chapterModal');
     if (modal) modal.style.display = "none";
 }
 
-// 4. Fechar modal se clicar fora da caixa preta
-window.onclick = function(event) {
-    const modal = document.getElementById('chapterModal');
-    if (event.target == modal) {
-        closeModal();
-    }
+// 4. SISTEMA DE LIKE
+let totalLikes = 0;
+function darLike() {
+    totalLikes++;
+    const num = document.getElementById('likeCount');
+    const btn = document.getElementById('likeBtn');
+    if (num) num.innerText = totalLikes;
+    if (btn) btn.style.color = "#ff0000";
 }
 
-// 5. Inicialização do Site (Garante que o HTML já existe)
+// 5. FECHAR SE CLICAR FORA
+window.onclick = function(event) {
+    const modal = document.getElementById('chapterModal');
+    if (event.target === modal) fecharJanela();
+};
+
+// 6. CARREGAR TUDO QUANDO A PÁGINA ABRIR
 document.addEventListener("DOMContentLoaded", function() {
-    const grid = document.getElementById('mangaGrid');
-    
-    if (grid) {
+    const grade = document.getElementById('mangaGrid');
+    if (grade) {
         const card = document.createElement('div');
         card.className = 'manga-card';
         card.innerHTML = `
-            <img src="${obra.capa}" alt="${obra.titulo}">
-            <p>${obra.titulo}</p>
+            <img src="capa.jpeg" alt="20 SOBRE LOVE">
+            <p>20 SOBRE LOVE</p>
         `;
-        
-        // Ao clicar na capa, chama a lista de capítulos
-        card.addEventListener('click', openModal);
-        grid.appendChild(card);
+        card.onclick = abrirJanela;
+        grade.appendChild(card);
     }
 });
