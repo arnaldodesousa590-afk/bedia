@@ -9,40 +9,44 @@
 <body>
     <nav class="navbar">
         <div class="logo">BÉDIA</div>
-        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <div class="menu-icon" id="btnAbrirMenu">☰</div>
     </nav>
 
     <div id="sideMenu" class="side-menu">
-        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
+        <span class="closebtn" id="btnFecharMenu">&times;</span>
         <a href="#">Início</a>
         <a href="#listaMangas">Mangás</a>
-        <a href="https://wa.me/seunumeroaqui">Enviar Obra</a>
+        <a href="https://wa.me/seunumerode_whatsapp">Enviar Obra</a>
     </div>
 
     <header class="main-banner">
         <div class="banner-content">
             <span class="status-tag">Destaque</span>
             <h1>Bédia Quadrinhos</h1>
-            <p>O universo dos novos mangakás independentes.</p>
+            <p class="banner-description">O universo dos novos mangakás independentes.</p>
             <div class="actions">
                 <a href="#listaMangas" class="btn-primary">Ler agora</a>
-                <a href="https://wa.me/seunumeroaqui?text=Olá! Quero enviar minha obra." class="btn-plus">+</a>
+                <a href="https://wa.me/seunumerode_whatsapp" class="btn-plus">+</a>
             </div>
         </div>
     </header>
 
     <section class="content-section" id="listaMangas">
-        <div class="section-header">
-            <h2>Últimas Obras</h2>
-        </div>
+        <h2>Últimas Obras</h2>
         <div id="mangaGrid" class="manga-grid"></div>
     </section>
 
     <div id="chapterModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h3 id="modalTitle">20 SOBRE LOVE</h3>
+            <span class="close-modal" id="btnFecharJanela">&times;</span>
+            <h3>20 SOBRE LOVE</h3>
             <div id="chapterList"></div>
-            
             <div class="interact-bar">
-                <button onclick="darLike()" id="likeBtn" class="
+                <button id="likeBtn" class="like-btn">❤️ <span id="likeCount">0</span></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
