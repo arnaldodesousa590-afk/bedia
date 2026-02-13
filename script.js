@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Lista de Capítulos
+    // 1. Capítulos
     const capitulos = [
         { n: "Capítulo 01", l: "20 SOBRE LOVE - 01.pdf" },
         { n: "Capítulo 02", l: "20 SOBRE LOVE - 02.pdf" },
@@ -12,17 +12,16 @@ document.addEventListener("DOMContentLoaded", function() {
         { n: "Capítulo 07", l: "20 SOBRE LOVE - 07.pdf" }
     ];
 
-    // 2. Elementos da Página
     const menu = document.getElementById("sideMenu");
     const modal = document.getElementById("chapterModal");
     const grid = document.getElementById("mangaGrid");
     const listaDiv = document.getElementById("chapterList");
 
-    // 3. Funções do Menu
+    // 2. Menu Lateral
     document.getElementById("btnAbrirMenu").addEventListener("click", () => menu.style.width = "250px");
     document.getElementById("btnFecharMenu").addEventListener("click", () => menu.style.width = "0");
 
-    // 4. Funções da Janela (Modal)
+    // 3. Abrir Janela e Listar Capítulos
     function abrirModal() {
         modal.style.display = "flex";
         listaDiv.innerHTML = "";
@@ -36,10 +35,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // 4. Fechar Janela
     document.getElementById("btnFecharJanela").addEventListener("click", () => modal.style.display = "none");
     window.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
 
-    // 5. Sistema de Like
+    // 5. Like
     let likes = 0;
     const btnLike = document.getElementById("likeBtn");
     btnLike.addEventListener("click", () => {
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
         btnLike.style.color = "#ff0000";
     });
 
-    // 6. Criar a Capa do Mangá
+    // 6. Criar Capa na Tela
     if (grid) {
         const card = document.createElement("div");
         card.className = "manga-card";
@@ -56,4 +56,10 @@ document.addEventListener("DOMContentLoaded", function() {
         card.addEventListener("click", abrirModal);
         grid.appendChild(card);
     }
+
+    // 7. Motor de Comentários (Disqus)
+    var d = document, s = d.createElement('script');
+    s.src = 'https://bedia-quadrinhos.disqus.com/embed.js'; 
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
 });

@@ -10,7 +10,7 @@ body { background-color: #0b0b0b; color: white; scroll-behavior: smooth; }
 .side-menu .closebtn { position: absolute; top: 0; right: 25px; font-size: 36px; cursor: pointer; }
 
 .main-banner { height: 80vh; background: linear-gradient(rgba(0,0,0,0.6), #0b0b0b), url('Bedia.jpeg'); background-size: cover; background-position: center; display: flex; align-items: center; padding: 20px; }
-.banner-description { margin-bottom: 40px; color: #ccc; font-size: 1.1rem; } /* Espaço aumentado aqui */
+.banner-description { margin-bottom: 40px; color: #ccc; font-size: 1.1rem; }
 
 .actions { display: flex; gap: 15px; }
 .btn-primary { background: #ff0000; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; }
@@ -19,12 +19,15 @@ body { background-color: #0b0b0b; color: white; scroll-behavior: smooth; }
 .content-section { padding: 60px 20px; }
 .manga-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; margin-top: 30px; }
 .manga-card { text-align: center; cursor: pointer; transition: 0.3s; }
-.manga-card:hover { transform: scale(1.05); }
 .manga-card img { width: 100%; border-radius: 10px; border: 1px solid #333; }
 
 .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
-.modal-content { background: #1a1a1a; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; position: relative; }
+.modal-content { background: #1a1a1a; padding: 30px; border-radius: 15px; width: 95%; max-width: 450px; text-align: center; position: relative; max-height: 90vh; overflow-y: auto; }
 .close-modal { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; color: #888; }
+
 .chapter-btn { display: block; background: #333; color: white; padding: 12px; margin: 10px 0; text-decoration: none; border-radius: 8px; font-weight: bold; }
 .chapter-btn:hover { background: #ff0000; }
-.like-btn { background: #252525; border: none; color: white; padding: 10px 25px; border-radius: 20px; cursor: pointer; margin-top: 15px; }
+
+.interact-bar { margin: 20px 0; border-top: 1px solid #333; padding-top: 15px; }
+.like-btn { background: #252525; border: none; color: white; padding: 10px 25px; border-radius: 20px; cursor: pointer; }
+.comments-area { margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; }
