@@ -1,55 +1,115 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <title>Bédia Quadrinhos</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bédia - 20 Sobre Love</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="sideMenu" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" id="btnFecharMenu">&times;</a>
-        <a href="#">Início</a>
-        <a href="#">Mangás</a>
-        <a href="#">Sobre</a>
-    </div>
-    <span id="btnAbrirMenu" style="font-size:30px;cursor:pointer;color:white;padding:20px;">&#9776; Menu</span>
+<header class="topbar">
+    <div class="logo">BÉDIA</div>
+    <button id="btnAbrirMenu" class="menu-btn">☰</button>
+</header>
 
-    <div class="container">
-        <div id="mangaGrid" class="manga-grid">
-            <div class="manga-card" onclick="abrirModal()">
-                <img src="capa.jpeg" alt="Capa 20 Sobre Love" id="mangaCapa">
-                <p>20 SOBRE LOVE</p>
+<section id="inicio" class="hero">
+    <span class="tag">Destaque</span>
+    <h1>Bédia<br>Quadrinhos</h1>
+    <p>O universo dos novos mangakás independentes.</p>
+    <button id="btnLerAgora" class="btn-main">Ler agora</button>
+</section>
+
+<!-- SEÇÃO MANGÁS -->
+<section id="mangas" class="mangas">
+    <div class="ultimos-header">
+        <h2>Mangás</h2>
+        <span id="btnVerMaisMangas" class="vermais">ver mais</span>
+    </div>
+
+    <div id="mangaList" class="grid"></div>
+
+    <button id="btnAddManga" class="btn-add">+ Adicionar Mangá</button>
+</section>
+
+<!-- SEÇÃO ÚLTIMOS CAPÍTULOS -->
+<section id="ultimos" class="ultimos">
+    <div class="ultimos-header">
+        <h2>Últimos Capítulos</h2>
+        <span id="btnVerMaisCapitulos" class="vermais">ver mais</span>
+    </div>
+
+    <div id="mangaGrid" class="grid"></div>
+</section>
+
+<!-- MENU -->
+<div id="sideMenu" class="side-menu">
+    <button id="btnFecharMenu" class="close-btn">✖</button>
+    <h3>Menu</h3>
+    <a href="#inicio" class="menu-link">Início</a>
+    <a href="#mangas" class="menu-link">Mangás</a>
+    <a href="#ultimos" class="menu-link">Últimos capítulos</a>
+    <a href="#inicio" class="menu-link">Destaques</a>
+    <a href="tel:948954142" class="menu-link menu-link-tel">Contato - 948 954 142</a>
+</div>
+
+<!-- MODAL CAPÍTULOS -->
+<div id="chapterModal" class="modal">
+    <div class="modal-content">
+        <h3>Capítulos disponíveis</h3>
+        <div id="chapterListModal"></div>
+        <button id="btnFecharModal" class="btn-modal">Fechar</button>
+    </div>
+</div>
+
+<!-- MODAL ADICIONAR MANGÁ: upload de capa + PDF (ficheiro disponível no site) -->
+<div id="addMangaModal" class="modal">
+    <div class="modal-content modal-form">
+        <h3>Publicar o teu mangá</h3>
+        <p class="modal-desc">Adiciona o nome, a imagem de capa e o PDF. O mangá ficará disponível no site para todos lerem.</p>
+        <form id="formAddManga">
+            <div class="form-group">
+                <label for="addMangaNome">Nome do mangá</label>
+                <input type="text" id="addMangaNome" placeholder="Ex: O Meu Mangá" required>
             </div>
-        </div>
-    </div>
-
-    <div id="chapterModal" class="modal">
-        <div class="modal-content">
-            <span id="btnFecharJanela" class="close">&times;</span>
-            <h2>Capítulos</h2>
-            
-            <div id="chapterList" class="chapter-list"></div>
-
-            <hr class="linha-separadora">
-
-            <div class="interacao-box">
-                <div class="votos">
-                    <button id="likeBtn">👍 <span id="likeCount">0</span></button>
-                    <button id="dislikeBtn">👎 <span id="dislikeCount">0</span></button>
-                </div>
-                
-                <div class="comentarios-area">
-                    <div id="listaComentarios" class="comentarios-feed"></div>
-                    <input type="text" id="nomeUser" placeholder="Teu nome...">
-                    <textarea id="textoMsg" placeholder="Comenta algo..."></textarea>
-                    <button id="enviarComentBtn">Enviar</button>
-                </div>
+            <div class="form-group">
+                <label for="addMangaCapaFile">Imagem de capa (JPG, PNG ou similar)</label>
+                <input type="file" id="addMangaCapaFile" accept="image/jpeg,image/png,image/gif,image/webp" required>
             </div>
-        </div>
+            <div class="form-group">
+                <label for="addMangaPdfFile">Mangá em PDF (capítulo ou obra completa)</label>
+                <input type="file" id="addMangaPdfFile" accept="application/pdf" required>
+            </div>
+            <div class="form-group">
+                <label for="addMangaTituloCap">Título do capítulo (opcional)</label>
+                <input type="text" id="addMangaTituloCap" placeholder="Ex: Capítulo 01">
+            </div>
+            <p id="addMangaMsg" class="form-msg"></p>
+            <button type="submit" id="btnSubmitManga" class="btn-modal btn-submit">Enviar e publicar</button>
+        </form>
+        <button id="btnFecharAddManga" class="btn-modal btn-secondary">Cancelar</button>
     </div>
+</div>
 
-    <script src="script.js"></script>
+<!-- MODAL COMENTÁRIOS -->
+<div id="commentsModal" class="modal">
+    <div class="modal-content modal-form">
+        <h3 id="commentsModalTitulo">Comentários</h3>
+        <div id="commentsList"></div>
+        <form id="formComment">
+            <input type="hidden" id="commentMangaId">
+            <div class="form-group">
+                <input type="text" id="commentAutor" placeholder="O teu nome (opcional)">
+            </div>
+            <div class="form-group">
+                <textarea id="commentTexto" placeholder="Escreve um comentário..." rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn-modal btn-submit">Enviar comentário</button>
+        </form>
+        <button id="btnFecharComments" class="btn-modal btn-secondary">Fechar</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,19 @@
+{
+  "mangas": [
+    { "id": "20-sobre-love", "nome": "20 Sobre Love", "capa": "capa.jpeg" }
+  ],
+  "capitulos": [
+    { "n": "Capítulo 01", "l": "20 SOBRE LOVE - 01.pdf", "capa": "capa.jpeg" },
+    { "n": "Capítulo 02", "l": "20 SOBRE LOVE - 02.pdf", "capa": "capa.jpeg" },
+    { "n": "Capítulo 03", "l": "20 SOBRE LOVE - 03_compressed.pdf", "capa": "capa.jpeg" },
+    { "n": "Capítulo 04", "l": "20 SOBRE LOVE - 04.pdf", "capa": "capa.jpeg" },
+    { "n": "Capítulo 05", "l": "20 SOBRE LOVE - 05.pdf", "capa": "capa.jpeg" },
+    { "n": "Capítulo 05.5", "l": "20 SOBRE LOVE - 05.5.pdf", "capa": "capa.jpeg" },
+    { "n": "Capítulo 06", "l": "20 SOBRE LOVE - 06.pdf", "capa": "capa.jpeg" },
+    { "n": "Capítulo 06.5", "l": "20 SOBRE LOVE - 06.5.pdf", "capa": "capa.jpeg" },
+    { "n": "Capítulo 07", "l": "20 SOBRE LOVE - 07.pdf", "capa": "capa.jpeg" }
+  ],
+  "reacoes": {
+    "20-sobre-love": { "likes": 0, "dislikes": 0, "comments": [] }
+  }
+}

@@ -1,24 +1,264 @@
-body { background-color: #0b0b0b; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
 
-.manga-grid { display: flex; justify-content: center; padding: 50px; }
-.manga-card { cursor: pointer; text-align: center; width: 200px; transition: 0.3s; }
-.manga-card img { width: 100%; border-radius: 10px; border: 2px solid #333; }
-.manga-card:hover { transform: scale(1.05); }
+body{
+    background-image:
+        linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.9)),
+        url("Bedia.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    color:#fff;
+}
 
-/* Modal */
-.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
-.modal-content { background: #1a1a1a; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; position: relative; }
-.close { position: absolute; right: 20px; top: 10px; font-size: 30px; color: #ff0000; cursor: pointer; }
+/* TOPO */
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 20px;
+}
 
-/* Botões de Capítulo */
-.chapter-btn { display: block; background: #333; color: white; padding: 10px; margin: 8px 0; text-decoration: none; border-radius: 5px; font-weight: bold; }
-.chapter-btn:hover { background: #555; }
+.logo{
+    color:#ff0033;
+    font-weight:bold;
+    font-size:22px;
+}
 
-/* Votos e Comentários */
-.interacao-box { margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
-.votos { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
-.votos button { background: #252525; border: 1px solid #444; color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
+.menu-btn{
+    background:none;
+    border:none;
+    color:#fff;
+    font-size:26px;
+}
 
-.comentarios-feed { background: #000; height: 100px; overflow-y: auto; margin-bottom: 10px; padding: 10px; border-radius: 5px; text-align: left; font-size: 14px; }
-.comentarios-area input, .comentarios-area textarea { width: 100%; background: #222; border: 1px solid #444; color: white; padding: 10px; border-radius: 5px; margin-bottom: 10px; box-sizing: border-box; }
-#enviarComentBtn { width: 100%; background: #ff0000; color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+/* HERO */
+.hero{
+    padding:40px 20px;
+}
+
+.tag{
+    background:#ff0033;
+    padding:6px 12px;
+    border-radius:5px;
+    font-size:12px;
+}
+
+.hero h1{
+    font-size:48px;
+    margin:15px 0;
+}
+
+.hero p{
+    opacity:0.85;
+    margin-bottom:20px;
+}
+
+.btn-main{
+    background:#ff0033;
+    border:none;
+    padding:14px 25px;
+    border-radius:8px;
+    color:#fff;
+    font-size:16px;
+}
+
+/* SEÇÕES */
+.mangas,.ultimos{
+    padding:20px;
+}
+
+.ultimos-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.vermais{
+    color:#ff0033;
+    font-size:14px;
+    cursor:pointer;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+    margin-top:15px;
+}
+
+.card{
+    background:rgba(0,0,0,0.55);
+    padding:12px;
+    border-radius:10px;
+    text-align:center;
+    backdrop-filter: blur(3px);
+}
+
+.card img{
+    width:100%;
+    max-width:120px;
+    height:160px;
+    object-fit:cover;
+    object-position:top;
+    border-radius:8px;
+    margin:0 auto 8px auto;
+    display:block;
+}
+
+
+.card h4{
+    font-size:14px;
+    margin-bottom:8px;
+}
+
+.card button.btn-ler{
+    background:#ff0033;
+    border:none;
+    padding:8px 12px;
+    border-radius:6px;
+    color:#fff;
+    font-size:12px;
+}
+
+.card-reacoes{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    justify-content:center;
+    align-items:center;
+    margin:8px 0;
+}
+.card-reacoes .num{ margin-left:2px; }
+.btn-like,.btn-dislike{
+    background:rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.3);
+    color:#fff;
+    padding:4px 8px;
+    border-radius:6px;
+    font-size:11px;
+    cursor:pointer;
+}
+.btn-comentarios{
+    background:none;
+    border:none;
+    color:#ff0033;
+    font-size:11px;
+    cursor:pointer;
+    padding:4px 6px;
+}
+.comment-item{ margin-bottom:12px; padding:10px; background:rgba(0,0,0,0.3); border-radius:8px; }
+.comment-item p{ margin:6px 0 0; font-size:14px; opacity:0.9; }
+.comment-data{ font-size:11px; opacity:0.7; margin-left:6px; }
+.loading,.sem-comentarios,.erro{ padding:10px; color:#aaa; font-size:14px; }
+.modal-form .form-group{ margin-bottom:14px; }
+.modal-form label{ display:block; margin-bottom:4px; font-size:14px; color:#ccc; }
+.modal-form input,.modal-form textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #333;
+    border-radius:8px;
+    background:#1b1b1b;
+    color:#fff;
+    font-size:14px;
+}
+.modal-form textarea{ resize:vertical; min-height:70px; }
+.modal-desc{ color:#aaa; font-size:13px; margin-bottom:16px; }
+.form-msg{ margin:8px 0; font-size:13px; min-height:1.2em; }
+.form-msg.erro{ color:#ff6b6b; }
+.form-msg.sucesso{ color:#51cf66; }
+.btn-modal{ margin:6px 8px 6px 0; cursor:pointer; }
+.btn-submit{ background:#ff0033 !important; color:#fff !important; padding:10px 20px !important; border:none !important; border-radius:8px !important; }
+.btn-secondary{ background:#333 !important; color:#fff !important; padding:8px 16px !important; border-radius:6px !important; }
+#commentsList{ max-height:200px; overflow-y:auto; margin-bottom:16px; }
+
+/* BOTÃO ADD */
+.btn-add{
+    margin-top:15px;
+    width:100%;
+    padding:12px;
+    background:transparent;
+    border:2px dashed #ff0033;
+    color:#ff0033;
+    border-radius:8px;
+}
+
+/* MENU */
+.side-menu{
+    position:fixed;
+    top:0;
+    right:-100%;
+    width:80%;
+    height:100%;
+    background:#0f0f0f;
+    padding:20px;
+    transition:.3s;
+    z-index:10;
+}
+
+.side-menu.active{
+    right:0;
+}
+
+.side-menu a{
+    display:block;
+    color:#fff;
+    text-decoration:none;
+    padding:10px 0;
+}
+
+.close-btn{
+    background:none;
+    border:none;
+    color:#fff;
+    font-size:22px;
+    float:right;
+}
+
+/* MODAL */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.7);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:20;
+}
+
+.modal-content{
+    background:#111;
+    padding:20px;
+    border-radius:10px;
+    width:85%;
+    max-height:80%;
+    overflow-y:auto;
+}
+
+.modal-content a{
+    display:block;
+    padding:10px;
+    background:#1b1b1b;
+    margin:6px 0;
+    border-radius:6px;
+    color:#fff;
+    text-decoration:none;
+}
+
+.modal-content > button.btn-modal,
+.modal-content .btn-modal{
+    all: unset;
+    display: inline-block;
+    padding: 8px 16px;
+    background: #ff0033;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+}
