@@ -1,19 +1,20 @@
 {
   "mangas": [
-    { "id": "20-sobre-love", "nome": "20 Sobre Love", "capa": "capa.jpeg" }
+    { "id": "20-sobre-love", "nome": "20 Sobre Love", "genero": "romance", "capa": "capa.jpeg", "usuario_id": null, "data_adicao": "2024-01-01 00:00", "avaliacao_media": 0.0, "avaliacoes": [], "visualizacoes": 0 }
   ],
   "capitulos": [
-    { "n": "Capítulo 01", "l": "20 SOBRE LOVE - 01.pdf", "capa": "capa.jpeg" },
-    { "n": "Capítulo 02", "l": "20 SOBRE LOVE - 02.pdf", "capa": "capa.jpeg" },
-    { "n": "Capítulo 03", "l": "20 SOBRE LOVE - 03_compressed.pdf", "capa": "capa.jpeg" },
-    { "n": "Capítulo 04", "l": "20 SOBRE LOVE - 04.pdf", "capa": "capa.jpeg" },
-    { "n": "Capítulo 05", "l": "20 SOBRE LOVE - 05.pdf", "capa": "capa.jpeg" },
-    { "n": "Capítulo 05.5", "l": "20 SOBRE LOVE - 05.5.pdf", "capa": "capa.jpeg" },
-    { "n": "Capítulo 06", "l": "20 SOBRE LOVE - 06.pdf", "capa": "capa.jpeg" },
-    { "n": "Capítulo 06.5", "l": "20 SOBRE LOVE - 06.5.pdf", "capa": "capa.jpeg" },
-    { "n": "Capítulo 07", "l": "20 SOBRE LOVE - 07.pdf", "capa": "capa.jpeg" }
+    { "n": "Capítulo 01", "l": "20 SOBRE LOVE - 01.pdf", "capa": "capa.jpeg", "manga_id": "20-sobre-love" },
+    { "n": "Capítulo 02", "l": "20 SOBRE LOVE - 02.pdf", "capa": "capa.jpeg", "manga_id": "20-sobre-love" },
+    { "n": "Capítulo 03", "l": "20 SOBRE LOVE - 03_compressed.pdf", "capa": "capa.jpeg", "manga_id": "20-sobre-love" },
+    { "n": "Capítulo 04", "l": "20 SOBRE LOVE - 04.pdf", "capa": "capa.jpeg", "manga_id": "20-sobre-love" },
+    { "n": "Capítulo 05", "l": "20 SOBRE LOVE - 05.pdf", "capa": "capa.jpeg", "manga_id": "20-sobre-love" },
+    { "n": "Capítulo 05.5", "l": "20 SOBRE LOVE - 05.5.pdf", "capa": "capa.jpeg", "manga_id": "20-sobre-love" },
+    { "n": "Capítulo 06", "l": "20 SOBRE LOVE - 06.pdf", "capa": "capa.jpeg", "manga_id": "20-sobre-love" },
+    { "n": "Capítulo 06.5", "l": "20 SOBRE LOVE - 06.5.pdf", "capa": "capa.jpeg", "manga_id": "20-sobre-love" },
+    { "n": "Capítulo 07", "l": "20 SOBRE LOVE - 07.pdf", "capa": "capa.jpeg", "manga_id": "20-sobre-love" }
   ],
   "reacoes": {
     "20-sobre-love": { "likes": 0, "dislikes": 0, "comments": [] }
-  }
+  },
+  "usuarios": []
 }

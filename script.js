@@ -1,341 +1,468 @@
-document.addEventListener("DOMContentLoaded", function () {
+// Variáveis globais
+var mangas = [];
+var capitulos = [];
+var usuarioLogado = null;
 
-    var mangas = [];
-    var capitulos = [];
+// Elementos do DOM
+var modal, mangaList, chapterListModal, addMangaModal, commentsModal, commentsList;
 
-    /* localStorage: likes/dislikes/comentários quando o servidor não está ligado */
-    var STORAGE_KEY = "bedia_reacoes";
-    function getLocalReacoes() {
-        try {
-            var s = localStorage.getItem(STORAGE_KEY);
-            return s ? JSON.parse(s) : { likes: {}, dislikes: {}, comments: {} };
-        } catch (e) { return { likes: {}, dislikes: {}, comments: {} }; }
+// Função de escape HTML
+function esc(s) {
+    if (!s) return "";
+    return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Fallback quando a API não responde
+var fallbackMangas = [
+    { id: "20-sobre-love", nome: "20 Sobre Love", genero: "romance", capa: "capa.jpeg", usuario_id: null, data_adicao: "2024-01-01 00:00", avaliacao_media: 0.0, avaliacoes: [], visualizacoes: 0, likes: 0, dislikes: 0, commentsCount: 0 }
+];
+
+var fallbackCapitulos = [
+    { n: "Capítulo 01", l: "20 SOBRE LOVE - 01.pdf", capa: "capa.jpeg", manga_id: "20-sobre-love" },
+    { n: "Capítulo 02", l: "20 SOBRE LOVE - 02.pdf", capa: "capa.jpeg", manga_id: "20-sobre-love" },
+    { n: "Capítulo 03", l: "20 SOBRE LOVE - 03_compressed.pdf", capa: "capa.jpeg", manga_id: "20-sobre-love" },
+    { n: "Capítulo 04", l: "20 SOBRE LOVE - 04.pdf", capa: "capa.jpeg", manga_id: "20-sobre-love" },
+    { n: "Capítulo 05", l: "20 SOBRE LOVE - 05.pdf", capa: "capa.jpeg", manga_id: "20-sobre-love" },
+    { n: "Capítulo 05.5", l: "20 SOBRE LOVE - 05.5.pdf", capa: "capa.jpeg", manga_id: "20-sobre-love" },
+    { n: "Capítulo 06", l: "20 SOBRE LOVE - 06.pdf", capa: "capa.jpeg", manga_id: "20-sobre-love" },
+    { n: "Capítulo 06.5", l: "20 SOBRE LOVE - 06.5.pdf", capa: "capa.jpeg", manga_id: "20-sobre-love" },
+    { n: "Capítulo 07", l: "20 SOBRE LOVE - 07.pdf", capa: "capa.jpeg", manga_id: "20-sobre-love" }
+];
+
+// Sistema de localStorage para reações
+function getLocalReacoes() {
+    var data = localStorage.getItem("bedia_reacoes");
+    return data ? JSON.parse(data) : { likes: {}, dislikes: {}, comments: {} };
+}
+
+function saveLocalReacoes(data) {
+    localStorage.setItem("bedia_reacoes", JSON.stringify(data));
+}
+
+function getLocalComments(mangaId) { 
+    return getLocalReacoes().comments[mangaId] || []; 
+}
+
+// Função principal para carregar dados
+function carregarDados() {
+    Promise.all([
+        fetch("/api/mangas").then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; }),
+        fetch("/api/capitulos").then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; })
+    ]).then(function(resultados) {
+        mangas = resultados[0] && resultados[0].length > 0 ? resultados[0] : fallbackMangas;
+        capitulos = resultados[1] && resultados[1].length > 0 ? resultados[1] : fallbackCapitulos;
+        
+        // Juntar contagens do localStorage
+        var local = getLocalReacoes();
+        mangas.forEach(function(m) {
+            var id = m.id || "";
+            m.likes = (m.likes || 0) + (local.likes[id] || 0);
+            m.dislikes = (m.dislikes || 0) + (local.dislikes[id] || 0);
+            m.commentsCount = (m.commentsCount || 0) + (local.comments[id] || []).length;
+        });
+        
+        carregarMangas();
+        carregarUltimosCapitulos();
+        criarResultadosPesquisa();
+    });
+}
+
+// Carregar mangás principais
+function carregarMangas() {
+    mangaList.innerHTML = "";
+    mangas.forEach(function(m) {
+        var id = m.id || "";
+        var nome = esc(m.nome);
+        var capa = m.capa || "";
+        var likes = m.likes || 0;
+        var dislikes = m.dislikes || 0;
+        var commentsCount = m.commentsCount || 0;
+
+        var card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML =
+            "<img src=\"" + esc(capa) + "\" alt=\"" + nome + "\">" +
+            "<h4>" + nome + "</h4>" +
+            "<div class=\"card-reacoes\">" +
+            "<div class=\"avaliacao-container\">" +
+            "<div class=\"estrelas-container\" data-manga-id=\"" + esc(id) + "\">" +
+            "<span class=\"estrela\" data-avaliacao=\"1\">⭐</span>" +
+            "<span class=\"estrela\" data-avaliacao=\"2\">⭐</span>" +
+            "<span class=\"estrela\" data-avaliacao=\"3\">⭐</span>" +
+            "<span class=\"estrela\" data-avaliacao=\"4\">⭐</span>" +
+            "<span class=\"estrela\" data-avaliacao=\"5\">⭐</span>" +
+            "</div>" +
+            "<span class=\"avaliacao-numero\">" + (m.avaliacao_media || 0) + "/5</span>" +
+            "</div>" +
+            "<div class=\"reacoes-botoes\">" +
+            "<button type=\"button\" class=\"btn-like\" data-manga-id=\"" + esc(id) + "\" title=\"Gostei\">🔥 <span class=\"num\">" + likes + "</span></button>" +
+            "<button type=\"button\" class=\"btn-dislike\" data-manga-id=\"" + esc(id) + "\" title=\"Não gostei\">👎 <span class=\"num\">" + dislikes + "</span></button>" +
+            "<button type=\"button\" class=\"btn-comentarios\" data-manga-id=\"" + esc(id) + "\" data-manga-nome=\"" + nome + "\">💬 Comentários (" + commentsCount + ")</button>" +
+            "<div class=\"visualizacoes\">👁️ " + (m.visualizacoes || 0) + " leituras</div>" +
+            "</div>" +
+            "</div>" +
+            "<button class=\"btn-ler\" onclick=\"abrirCapitulos('" + esc(id) + "')\">Ler</button>";
+        mangaList.appendChild(card);
+    });
+    
+    adicionarEventosAosCards();
+}
+
+// Carregar últimos capítulos
+function carregarUltimosCapitulos() {
+    var ultimosContainer = document.getElementById("mangaGrid");
+    if (!ultimosContainer) return;
+    
+    if (capitulos.length === 0) {
+        ultimosContainer.innerHTML = '<div class="sem-capitulos">Nenhum capítulo publicado ainda.</div>';
+        return;
     }
-    function saveLocalReacoes(data) {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
-    }
-    function getLocalLikes(mangaId) { return getLocalReacoes().likes[mangaId] || 0; }
-    function getLocalDislikes(mangaId) { return getLocalReacoes().dislikes[mangaId] || 0; }
-    function getLocalComments(mangaId) { return getLocalReacoes().comments[mangaId] || []; }
+    
+    var capitulosOrdenados = capitulos.slice().sort(function(a, b) {
+        return b.data_adicao ? b.data_adicao.localeCompare(a.data_adicao || "") : -1;
+    });
+    
+    var ultimos6 = capitulosOrdenados.slice(0, 6);
+    var html = '';
+    
+    ultimos6.forEach(function(cap) {
+        var manga = mangas.find(function(m) { return m.id === cap.manga_id; });
+        var nomeManga = manga ? manga.nome : "Mangá Desconhecido";
+        var capaManga = manga ? manga.capa : "capa-default.jpg";
+        
+        html += '<div class="card">' +
+        '<img src="' + esc(capaManga) + '" alt="' + esc(nomeManga) + '">' +
+        '<h4>' + esc(cap.n) + '</h4>' +
+        '<p class="manga-titulo">' + esc(nomeManga) + '</p>' +
+        '<button class="btn-ler" onclick="window.open(\'' + esc(cap.l) + '\', \'_blank\')">📖 Ler Agora</button>' +
+        '</div>';
+    });
+    
+    ultimosContainer.innerHTML = html;
+}
 
-    /* Fallback quando a API não responde (ex.: abrir o ficheiro diretamente) */
-    var fallbackMangas = [
-        { id: "20-sobre-love", nome: "20 Sobre Love", capa: "capa.jpeg", likes: 0, dislikes: 0, commentsCount: 0 }
-    ];
-    var fallbackCapitulos = [
-        { n: "Capítulo 01", l: "20 SOBRE LOVE - 01.pdf", capa: "capa.jpeg" },
-        { n: "Capítulo 02", l: "20 SOBRE LOVE - 02.pdf", capa: "capa.jpeg" },
-        { n: "Capítulo 03", l: "20 SOBRE LOVE - 03_compressed.pdf", capa: "capa.jpeg" },
-        { n: "Capítulo 04", l: "20 SOBRE LOVE - 04.pdf", capa: "capa.jpeg" },
-        { n: "Capítulo 05", l: "20 SOBRE LOVE - 05.pdf", capa: "capa.jpeg" },
-        { n: "Capítulo 05.5", l: "20 SOBRE LOVE - 05.5.pdf", capa: "capa.jpeg" },
-        { n: "Capítulo 06", l: "20 SOBRE LOVE - 06.pdf", capa: "capa.jpeg" },
-        { n: "Capítulo 06.5", l: "20 SOBRE LOVE - 06.5.pdf", capa: "capa.jpeg" },
-        { n: "Capítulo 07", l: "20 SOBRE LOVE - 07.pdf", capa: "capa.jpeg" }
-    ];
-
-    var menu = document.getElementById("sideMenu");
-    var modal = document.getElementById("chapterModal");
+// Modal de capítulos
+function carregarModal(mangaId) {
     var chapterListModal = document.getElementById("chapterListModal");
-    var mangaGrid = document.getElementById("mangaGrid");
-    var mangaList = document.getElementById("mangaList");
-    var addMangaModal = document.getElementById("addMangaModal");
-    var commentsModal = document.getElementById("commentsModal");
-    var commentsList = document.getElementById("commentsList");
-    var commentsModalTitulo = document.getElementById("commentsModalTitulo");
+    if (!chapterListModal) return;
+    
+    var html = "";
+    var capitulosDoManga = capitulos.filter(function(cap) {
+        return cap.manga_id === mangaId;
+    });
+    
+    if (capitulosDoManga.length === 0) {
+        html = '<p class="sem-capitulos-modal">Nenhum capítulo disponível para este mangá.</p>';
+    } else {
+        capitulosDoManga.forEach(function(cap) {
+            var manga = mangas.find(function(m) { return m.id === cap.manga_id; });
+            var nomeManga = manga ? manga.nome : "Mangá Desconhecido";
+            var capaManga = manga ? manga.capa : "capa-default.jpg";
+            
+            html += '<div class="chapter-item">' +
+            '<img src="' + esc(capaManga) + '" alt="' + esc(nomeManga) + '" class="chapter-capa">' +
+            '<div class="chapter-info">' +
+            '<h4>' + esc(cap.n) + '</h4>' +
+            '<p class="chapter-manga">' + esc(nomeManga) + '</p>' +
+            '</div>' +
+            '<button class="btn-ler-capitulo" onclick="window.open(\'' + esc(cap.l) + '\', \'_blank\')">📖 Ler</button>' +
+            '</div>';
+        });
+    }
+    
+    chapterListModal.innerHTML = html;
+}
 
-    /* MENU */
-    document.getElementById("btnAbrirMenu").onclick = function() { menu.classList.add("active"); };
-    document.getElementById("btnFecharMenu").onclick = function() { menu.classList.remove("active"); };
+window.abrirCapitulos = function(mangaId) {
+    modal.style.display = "flex";
+    carregarModal(mangaId);
+};
 
-    /* LINKS DO MENU */
-    document.querySelectorAll(".menu-link").forEach(function(link) {
-        link.addEventListener("click", function(e) {
-            var href = this.getAttribute("href") || "";
-            if (href.startsWith("tel:")) {
-                menu.classList.remove("active");
-                return;
-            }
-            e.preventDefault();
-            if (href.startsWith("#")) {
-                var sec = document.querySelector(href);
-                if (sec) {
-                    menu.classList.remove("active");
-                    sec.scrollIntoView({ behavior: "smooth" });
+// Adicionar eventos aos cards
+function adicionarEventosAosCards() {
+    // Sistema de Avaliação com Estrelas
+    mangaList.querySelectorAll(".estrelas-container").forEach(function(container) {
+        var mangaId = container.getAttribute("data-manga-id");
+        var estrelas = container.querySelectorAll(".estrela");
+        
+        estrelas.forEach(function(estrela) {
+            estrela.onclick = function() {
+                if (!usuarioLogado) {
+                    alert("Você precisa estar logado para avaliar. Clique em 'Entrar' para criar sua conta!");
+                    return;
                 }
-            }
+                
+                var avaliacao = parseInt(this.getAttribute("data-avaliacao"));
+                
+                fetch("/api/reacoes/" + encodeURIComponent(mangaId) + "/avaliar", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        "avaliacao": avaliacao,
+                        "usuario_id": usuarioLogado.id
+                    })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                    if (res.erro) { alert(res.erro); return; }
+                    
+                    // Atualizar estrelas
+                    estrelas.forEach(function(e, i) {
+                        if (i < avaliacao) {
+                            e.classList.add("ativa");
+                        } else {
+                            e.classList.remove("ativa");
+                        }
+                    });
+                    
+                    // Atualizar número
+                    var avaliacaoNumero = container.parentElement.querySelector(".avaliacao-numero");
+                    if (avaliacaoNumero) {
+                        avaliacaoNumero.textContent = avaliacao + "/5";
+                    }
+                })
+                .catch(function() {
+                    // Fallback localStorage
+                    estrelas.forEach(function(e, i) {
+                        if (i < avaliacao) {
+                            e.classList.add("ativa");
+                        } else {
+                            e.classList.remove("ativa");
+                        }
+                    });
+                });
+            };
         });
     });
+    
+    // Botões Like
+    mangaList.querySelectorAll(".btn-like").forEach(function(btn) {
+        btn.onclick = function() {
+            if (!usuarioLogado) {
+                alert("Você precisa estar logado para curtir. Clique em 'Entrar' para criar sua conta!");
+                return;
+            }
+            
+            var mangaId = this.getAttribute("data-manga-id");
+            var numElement = this.querySelector(".num");
+            var currentLikes = parseInt(numElement.textContent) || 0;
+            
+            fetch("/api/reacoes/" + encodeURIComponent(mangaId) + "/like", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({"usuario_id": usuarioLogado.id})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.erro) { alert(res.erro); return; }
+                numElement.textContent = res.likes || currentLikes + 1;
+            })
+            .catch(function() {
+                // Fallback localStorage
+                var local = getLocalReacoes();
+                local.likes[mangaId] = (local.likes[mangaId] || 0) + 1;
+                saveLocalReacoes(local);
+                numElement.textContent = currentLikes + 1;
+            });
+        };
+    });
+    
+    // Botões Dislike
+    mangaList.querySelectorAll(".btn-dislike").forEach(function(btn) {
+        btn.onclick = function() {
+            if (!usuarioLogado) {
+                alert("Você precisa estar logado para avaliar. Clique em 'Entrar' para criar sua conta!");
+                return;
+            }
+            
+            var mangaId = this.getAttribute("data-manga-id");
+            var numElement = this.querySelector(".num");
+            var currentDislikes = parseInt(numElement.textContent) || 0;
+            
+            fetch("/api/reacoes/" + encodeURIComponent(mangaId) + "/dislike", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({"usuario_id": usuarioLogado.id})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.erro) { alert(res.erro); return; }
+                numElement.textContent = res.dislikes || currentDislikes + 1;
+            })
+            .catch(function() {
+                // Fallback localStorage
+                var local = getLocalReacoes();
+                local.dislikes[mangaId] = (local.dislikes[mangaId] || 0) + 1;
+                saveLocalReacoes(local);
+                numElement.textContent = currentDislikes + 1;
+            });
+        };
+    });
+    
+    // Botões Comentários
+    mangaList.querySelectorAll(".btn-comentarios").forEach(function(btn) {
+        btn.onclick = function() {
+            var mangaId = this.getAttribute("data-manga-id");
+            var nome = this.getAttribute("data-manga-nome") || "Mangá";
+            document.getElementById("commentMangaId").value = mangaId;
+            document.getElementById("commentMangaNome").textContent = nome;
+            commentsModal.style.display = "flex";
+            carregarComentarios(mangaId);
+        };
+    });
+}
 
-    /* MODAL CAPÍTULOS */
-    document.getElementById("btnLerAgora").onclick = function() {
-        document.querySelector(".mangas").scrollIntoView({ behavior: "smooth" });
-    };
+// Sistema de pesquisa
+function criarResultadosPesquisa() {
+    var resultadosContainer = document.getElementById("resultadosPesquisa");
+    if (!resultadosContainer) return;
+    
+    resultadosContainer.innerHTML = "";
+    
+    mangas.forEach(function(manga) {
+        var div = document.createElement("div");
+        div.className = "resultado-pesquisa";
+        div.setAttribute("data-manga-id", manga.id);
+        div.innerHTML = 
+            '<img src="' + esc(manga.capa) + '" alt="' + esc(manga.nome) + '">' +
+            '<div class="resultado-info">' +
+            '<h5>' + esc(manga.nome) + '</h5>' +
+            '<p class="resultado-genero">' + esc(manga.genero || "Sem gênero") + '</p>' +
+            '</div>';
+        
+        div.onclick = function() {
+            selecionarManga(manga.id);
+        };
+        
+        resultadosContainer.appendChild(div);
+    });
+}
+
+function selecionarManga(mangaId) {
+    var manga = mangas.find(function(m) { return m.id === mangaId; });
+    if (!manga) return;
+    
+    var modal = document.getElementById("modalManga");
+    if (!modal) return;
+    
+    modal.innerHTML = 
+        '<div class="modal-manga-conteudo">' +
+        '<button class="fechar-modal-manga" onclick="fecharModalManga()">✖</button>' +
+        '<img src="' + esc(manga.capa) + '" alt="' + esc(manga.nome) + '" class="modal-manga-capa">' +
+        '<div class="modal-manga-info">' +
+        '<h2>' + esc(manga.nome) + '</h2>' +
+        '<p class="modal-manga-genero">Gênero: ' + esc(manga.genero || "Não especificado") + '</p>' +
+        '<p class="modal-manga-descricao">Este mangá está disponível para leitura. Clique em "Ler" para acessar os capítulos.</p>' +
+        '<div class="modal-manga-acoes">' +
+        '<button class="btn-modal-ler" onclick="abrirCapitulos(\'' + esc(manga.id) + '\')">📖 Ler Agora</button>' +
+        '<button class="btn-modal-fechar" onclick="fecharModalManga()">Fechar</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+    
+    modal.style.display = "flex";
+}
+
+function fecharModalManga() {
+    var modal = document.getElementById("modalManga");
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
+// Carregar comentários
+function carregarComentarios(mangaId) {
+    commentsList.innerHTML = "<p class='loading'>A carregar...</p>";
+    fetch("/api/reacoes/" + encodeURIComponent(mangaId))
+    .then(function(r) { return r.json(); })
+    .then(function(r) {
+        var comments = r.comments || [];
+        var local = getLocalComments(mangaId);
+        renderComentariosLista(comments.concat(local));
+    })
+    .catch(function() {
+        var local = getLocalComments(mangaId);
+        renderComentariosLista(local);
+    });
+}
+
+function renderComentariosLista(comments) {
+    commentsList.innerHTML = "";
+    if (!comments || comments.length === 0) {
+        commentsList.innerHTML = "<p class='sem-comentarios'>Ainda não há comentários. Sê o primeiro!</p>";
+        return;
+    }
+    comments.forEach(function(c) {
+        var div = document.createElement("div");
+        div.className = "comment-item";
+        div.innerHTML = "<strong>" + esc(c.autor) + "</strong> <span class='comment-data'>" + esc(c.data || "") + "</span><p>" + esc(c.texto) + "</p>";
+        commentsList.appendChild(div);
+    });
+}
+
+// Inicialização quando o DOM estiver pronto
+document.addEventListener("DOMContentLoaded", function() {
+    // Obter elementos do DOM
+    modal = document.getElementById("chapterModal");
+    mangaList = document.getElementById("mangaList");
+    chapterListModal = document.getElementById("chapterListModal");
+    addMangaModal = document.getElementById("addMangaModal");
+    commentsModal = document.getElementById("commentsModal");
+    commentsList = document.getElementById("commentsList");
+    
+    // Eventos dos modais
     document.getElementById("btnFecharModal").onclick = function() {
         modal.style.display = "none";
     };
-    document.getElementById("btnVerMaisMangas").onclick = function() {
-        document.querySelector(".mangas").scrollIntoView({ behavior: "smooth" });
-    };
-    document.getElementById("btnVerMaisCapitulos").onclick = function() {
-        modal.style.display = "flex";
-        carregarModal();
-    };
-
-    /* MODAL ADICIONAR MANGÁ - upload de capa + PDF */
-    document.getElementById("btnAddManga").onclick = function() {
-        addMangaModal.style.display = "flex";
-        document.getElementById("addMangaNome").value = "";
-        document.getElementById("addMangaCapaFile").value = "";
-        document.getElementById("addMangaPdfFile").value = "";
-        document.getElementById("addMangaTituloCap").value = "";
-        document.getElementById("addMangaMsg").textContent = "";
-    };
-    document.getElementById("btnFecharAddManga").onclick = function() {
-        addMangaModal.style.display = "none";
-    };
-    document.getElementById("formAddManga").onsubmit = function(e) {
-        e.preventDefault();
-        var nome = document.getElementById("addMangaNome").value.trim();
-        var capaFile = document.getElementById("addMangaCapaFile").files[0];
-        var pdfFile = document.getElementById("addMangaPdfFile").files[0];
-        var msgEl = document.getElementById("addMangaMsg");
-        var btnSubmit = document.getElementById("btnSubmitManga");
-        if (!nome) { msgEl.textContent = "Escreve o nome do mangá."; msgEl.className = "form-msg erro"; return; }
-        if (!capaFile) { msgEl.textContent = "Escolhe uma imagem de capa."; msgEl.className = "form-msg erro"; return; }
-        if (!pdfFile) { msgEl.textContent = "Escolhe o PDF do mangá."; msgEl.className = "form-msg erro"; return; }
-        var tituloCap = document.getElementById("addMangaTituloCap").value.trim() || "Capítulo 01";
-        var formData = new FormData();
-        formData.append("nome", nome);
-        formData.append("capa", capaFile);
-        formData.append("pdf", pdfFile);
-        formData.append("titulo_capitulo", tituloCap);
-        msgEl.textContent = "A enviar...";
-        msgEl.className = "form-msg";
-        btnSubmit.disabled = true;
-        fetch("/api/mangas", { method: "POST", body: formData })
-        .then(function(r) { return r.json(); })
-        .then(function(res) {
-            btnSubmit.disabled = false;
-            if (res.erro) { msgEl.textContent = res.erro; msgEl.className = "form-msg erro"; return; }
-            addMangaModal.style.display = "none";
-            msgEl.textContent = "";
-            alert("Mangá publicado! Já está disponível no site para todos lerem.");
-            carregarDados();
-        })
-        .catch(function() {
-            btnSubmit.disabled = false;
-            msgEl.textContent = "Erro de ligação. Corre o servidor (python app.py) e tenta outra vez.";
-            msgEl.className = "form-msg erro";
-        });
-    };
-
-    /* MODAL COMENTÁRIOS */
+    
     document.getElementById("btnFecharComments").onclick = function() {
         commentsModal.style.display = "none";
     };
+    
     document.getElementById("formComment").onsubmit = function(e) {
         e.preventDefault();
+        
+        if (!usuarioLogado) {
+            alert("Você precisa estar logado para comentar. Clique em 'Entrar' para criar sua conta!");
+            return;
+        }
+        
         var mangaId = document.getElementById("commentMangaId").value;
-        var autor = document.getElementById("commentAutor").value.trim();
+        var autor = usuarioLogado.nome;
         var texto = document.getElementById("commentTexto").value.trim();
         if (!texto) return;
+        
         fetch("/api/reacoes/" + encodeURIComponent(mangaId) + "/comentarios", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ autor: autor || "Anónimo", texto: texto })
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ autor: autor, texto: texto })
         })
         .then(function(r) { return r.json(); })
         .then(function(res) {
             if (res.erro) { alert(res.erro); return; }
             document.getElementById("commentTexto").value = "";
             carregarComentarios(mangaId);
-            var list = document.getElementById("commentsList");
-            var p = document.createElement("p");
-            p.className = "form-msg sucesso";
-            p.textContent = "Comentário enviado!";
-            list.insertBefore(p, list.firstChild);
-            setTimeout(function() { p.remove(); }, 3000);
         })
         .catch(function() {
-            /* Sem servidor: guardar no browser e atualizar a lista + contagem no card */
+            // Fallback localStorage
             var data = getLocalReacoes();
             data.comments[mangaId] = data.comments[mangaId] || [];
             data.comments[mangaId].push({
-                autor: autor || "Anónimo",
+                autor: autor,
                 texto: texto,
                 data: new Date().toISOString().slice(0, 16).replace("T", " ")
             });
             saveLocalReacoes(data);
             document.getElementById("commentTexto").value = "";
             carregarComentarios(mangaId);
-            var btnCom = document.querySelector(".btn-comentarios[data-manga-id=\"" + mangaId + "\"]");
-            if (btnCom) {
-                var n = (parseInt(btnCom.textContent.replace(/\D/g, ""), 10) || 0) + 1;
-                btnCom.textContent = "💬 Comentários (" + n + ")";
-            }
         });
     };
-
-    /* API - carregar dados (usa fallback se a API falhar ou devolver vazio) */
-    function carregarDados() {
-        Promise.all([
-            fetch("/api/mangas").then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; }),
-            fetch("/api/capitulos").then(function(r) { return r.ok ? r.json() : []; }).catch(function() { return []; })
-        ]).then(function(resultados) {
-            mangas = resultados[0] && resultados[0].length > 0 ? resultados[0] : fallbackMangas;
-            capitulos = resultados[1] && resultados[1].length > 0 ? resultados[1] : fallbackCapitulos;
-            /* Juntar contagens do localStorage (quando abres o ficheiro sem servidor) */
-            var local = getLocalReacoes();
-            mangas.forEach(function(m) {
-                var id = m.id || "";
-                m.likes = (m.likes || 0) + (local.likes[id] || 0);
-                m.dislikes = (m.dislikes || 0) + (local.dislikes[id] || 0);
-                m.commentsCount = (m.commentsCount || 0) + (local.comments[id] || []).length;
-            });
-            carregarMangas();
-            carregarUltimosCapitulos();
-        });
-    }
-
-    function esc(s) {
-        if (!s) return "";
-        return String(s)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/"/g, "&quot;");
-    }
-
-    function carregarMangas() {
-        mangaList.innerHTML = "";
-        mangas.forEach(function(m) {
-            var id = m.id || "";
-            var nome = esc(m.nome);
-            var capa = m.capa || "";
-            var likes = m.likes || 0;
-            var dislikes = m.dislikes || 0;
-            var commentsCount = m.commentsCount || 0;
-
-            var card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML =
-                "<img src=\"" + esc(capa) + "\" alt=\"" + nome + "\">" +
-                "<h4>" + nome + "</h4>" +
-                "<div class=\"card-reacoes\">" +
-                "<button type=\"button\" class=\"btn-like\" data-manga-id=\"" + esc(id) + "\" title=\"Gostei\">👍 <span class=\"num\">" + likes + "</span></button>" +
-                "<button type=\"button\" class=\"btn-dislike\" data-manga-id=\"" + esc(id) + "\" title=\"Não gostei\">👎 <span class=\"num\">" + dislikes + "</span></button>" +
-                "<button type=\"button\" class=\"btn-comentarios\" data-manga-id=\"" + esc(id) + "\" data-manga-nome=\"" + nome + "\">💬 Comentários (" + commentsCount + ")</button>" +
-                "</div>" +
-                "<button class=\"btn-ler\" onclick=\"abrirCapitulos()\">Ler</button>";
-            mangaList.appendChild(card);
-        });
-
-        /* Like: tenta servidor; se falhar, guarda no browser (localStorage) */
-        mangaList.querySelectorAll(".btn-like").forEach(function(btn) {
-            btn.onclick = function() {
-                var mid = this.getAttribute("data-manga-id");
-                var span = btn.querySelector(".num");
-                fetch("/api/reacoes/" + encodeURIComponent(mid) + "/like", { method: "POST" })
-                    .then(function(r) { return r.json(); })
-                    .then(function(res) {
-                        if (res.ok && res.likes !== undefined && span) span.textContent = res.likes;
-                    })
-                    .catch(function() {
-                        var data = getLocalReacoes();
-                        data.likes[mid] = (data.likes[mid] || 0) + 1;
-                        saveLocalReacoes(data);
-                        if (span) span.textContent = (parseInt(span.textContent, 10) || 0) + 1;
-                    });
-            };
-        });
-        /* Dislike: igual ao like */
-        mangaList.querySelectorAll(".btn-dislike").forEach(function(btn) {
-            btn.onclick = function() {
-                var mid = this.getAttribute("data-manga-id");
-                var span = btn.querySelector(".num");
-                fetch("/api/reacoes/" + encodeURIComponent(mid) + "/dislike", { method: "POST" })
-                    .then(function(r) { return r.json(); })
-                    .then(function(res) {
-                        if (res.ok && res.dislikes !== undefined && span) span.textContent = res.dislikes;
-                    })
-                    .catch(function() {
-                        var data = getLocalReacoes();
-                        data.dislikes[mid] = (data.dislikes[mid] || 0) + 1;
-                        saveLocalReacoes(data);
-                        if (span) span.textContent = (parseInt(span.textContent, 10) || 0) + 1;
-                    });
-            };
-        });
-        /* Abrir comentários */
-        mangaList.querySelectorAll(".btn-comentarios").forEach(function(btn) {
-            btn.onclick = function() {
-                var mid = this.getAttribute("data-manga-id");
-                var nome = this.getAttribute("data-manga-nome") || "Mangá";
-                document.getElementById("commentMangaId").value = mid;
-                commentsModalTitulo.textContent = "Comentários – " + nome;
-                commentsModal.style.display = "flex";
-                carregarComentarios(mid);
-            };
-        });
-    }
-
-    function renderComentariosLista(comments) {
-        commentsList.innerHTML = "";
-        if (!comments || comments.length === 0) {
-            commentsList.innerHTML = "<p class=\"sem-comentarios\">Ainda não há comentários. Sê o primeiro!</p>";
-            return;
-        }
-        comments.forEach(function(c) {
-            var div = document.createElement("div");
-            div.className = "comment-item";
-            div.innerHTML = "<strong>" + esc(c.autor) + "</strong> <span class=\"comment-data\">" + esc(c.data || "") + "</span><p>" + esc(c.texto) + "</p>";
-            commentsList.appendChild(div);
-        });
-    }
-    function carregarComentarios(mangaId) {
-        commentsList.innerHTML = "<p class=\"loading\">A carregar...</p>";
-        fetch("/api/reacoes/" + encodeURIComponent(mangaId))
-            .then(function(r) { return r.json(); })
-            .then(function(r) {
-                var comments = r.comments || [];
-                var local = getLocalComments(mangaId);
-                renderComentariosLista(comments.concat(local));
-            })
-            .catch(function() {
-                renderComentariosLista(getLocalComments(mangaId));
-            });
-    }
-
-    function carregarUltimosCapitulos() {
-        mangaGrid.innerHTML = "";
-        var ultimos = capitulos.slice(-4).reverse();
-        ultimos.forEach(function(cap) {
-            var card = document.createElement("div");
-            card.className = "card";
-            var link = (cap.l || "").replace(/"/g, "&quot;").replace(/'/g, "\\'");
-            card.innerHTML =
-                "<img src=\"" + esc(cap.capa) + "\" alt=\"" + esc(cap.n) + "\">" +
-                "<h4>" + esc(cap.n) + "</h4>" +
-                "<button onclick=\"window.open('" + link + "','_blank')\">Ler</button>";
-            mangaGrid.appendChild(card);
-        });
-    }
-
-    function carregarModal() {
-        chapterListModal.innerHTML = "";
-        capitulos.forEach(function(cap) {
-            var a = document.createElement("a");
-            a.href = cap.l || "#";
-            a.target = "_blank";
-            a.innerText = cap.n || "";
-            chapterListModal.appendChild(a);
-        });
-    }
-
-    window.abrirCapitulos = function() {
-        modal.style.display = "flex";
-        carregarModal();
-    };
-
+    
+    // Carregar dados iniciais
     carregarDados();
 });

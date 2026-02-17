@@ -10,6 +10,13 @@
 
 <header class="topbar">
     <div class="logo">BÉDIA</div>
+    <div class="topbar-actions">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Pesquisar mangás..." class="search-input">
+            <button id="btnSearch" class="search-btn" onclick="pesquisarComBotao()">🔍</button>
+        </div>
+        <button id="btnPerfil" class="perfil-btn">👤 Entrar</button>
+    </div>
     <button id="btnAbrirMenu" class="menu-btn">☰</button>
 </header>
 
@@ -26,10 +33,51 @@
         <h2>Mangás</h2>
         <span id="btnVerMaisMangas" class="vermais">ver mais</span>
     </div>
+    
+    <!-- FILTROS DESTACADOS -->
+    <div class="filtros-destaque">
+        <h3 class="filtros-titulo">🔍 Filtrar por:</h3>
+        <div class="filtros-container">
+            <div class="filtro-group">
+                <label for="filtroOrdenar">Ordenar:</label>
+                <select id="filtroOrdenar" class="filtro-select">
+                    <option value="recentes">📅 Mais Recentes</option>
+                    <option value="populares">🔥 Mais Populares</option>
+                    <option value="nome">🔤 Por Nome</option>
+                </select>
+            </div>
+            <div class="filtro-group">
+                <label for="filtroGenero">Gênero:</label>
+                <select id="filtroGenero" class="filtro-select">
+                    <option value="todos">📚 Todos Gêneros</option>
+                    <option value="acao">⚔️ Ação</option>
+                    <option value="romance">💕 Romance</option>
+                    <option value="fantasia">🌟 Fantasia</option>
+                    <option value="comedia">😄 Comédia</option>
+                    <option value="drama">🎭 Drama</option>
+                    <option value="terror">👻 Terror</option>
+                    <option value="ficcao">🚀 Ficção Científica</option>
+                    <option value="esporte">⚽ Esporte</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Banner do site online -->
+    <div class="site-banner" id="siteBanner" style="display: none;">
+        <div class="banner-content">
+            <div class="banner-info">
+                <h3>Bédia Quadrinhos Online</h3>
+                <p>Leia nossos mangás independentes diretamente no navegador!</p>
+                <a href="https://bedia.netlify.app/" target="_blank" class="banner-btn">Visitar Site</a>
+            </div>
+            <div class="banner-close" onclick="fecharBanner()">✖</div>
+        </div>
+    </div>
 
     <div id="mangaList" class="grid"></div>
 
-    <button id="btnAddManga" class="btn-add">+ Adicionar Mangá</button>
+    <button id="btnAddManga" class="btn-add">+ Adicionar Mangá (Precisa Login)</button>
 </section>
 
 <!-- SEÇÃO ÚLTIMOS CAPÍTULOS -->
@@ -42,6 +90,31 @@
     <div id="mangaGrid" class="grid"></div>
 </section>
 
+<!-- SEÇÃO ESTATÍSTICAS (se logado) -->
+<section id="estatisticas" class="estatisticas" style="display: none;">
+    <div class="ultimos-header">
+        <h2>Minhas Estatísticas</h2>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3 id="statMangasAdicionados">0</h3>
+            <p>Mangás Adicionados</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="statTotalLikes">0</h3>
+            <p>Total de Likes</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="statTotalComentarios">0</h3>
+            <p>Total de Comentários</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="statMangasPopulares">0</h3>
+            <p>Mangás Populares</p>
+        </div>
+    </div>
+</section>
+
 <!-- MENU -->
 <div id="sideMenu" class="side-menu">
     <button id="btnFecharMenu" class="close-btn">✖</button>
@@ -49,6 +122,7 @@
     <a href="#inicio" class="menu-link">Início</a>
     <a href="#mangas" class="menu-link">Mangás</a>
     <a href="#ultimos" class="menu-link">Últimos capítulos</a>
+    <a href="#estatisticas" class="menu-link" id="linkEstatisticas" style="display: none;">Minhas Estatísticas</a>
     <a href="#inicio" class="menu-link">Destaques</a>
     <a href="tel:948954142" class="menu-link menu-link-tel">Contato - 948 954 142</a>
 </div>
@@ -67,14 +141,28 @@
     <div class="modal-content modal-form">
         <h3>Publicar o teu mangá</h3>
         <p class="modal-desc">Adiciona o nome, a imagem de capa e o PDF. O mangá ficará disponível no site para todos lerem.</p>
-        <form id="formAddManga">
+        <form id="formAddManga" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="addMangaNome">Nome do mangá</label>
-                <input type="text" id="addMangaNome" placeholder="Ex: O Meu Mangá" required>
+                <input type="text" id="addMangaNome" placeholder="Nome do mangá" required>
             </div>
             <div class="form-group">
-                <label for="addMangaCapaFile">Imagem de capa (JPG, PNG ou similar)</label>
-                <input type="file" id="addMangaCapaFile" accept="image/jpeg,image/png,image/gif,image/webp" required>
+                <label for="addMangaGenero">Gênero</label>
+                <select id="addMangaGenero" class="form-select" required>
+                    <option value="">Selecione o gênero...</option>
+                    <option value="acao">Ação</option>
+                    <option value="romance">Romance</option>
+                    <option value="fantasia">Fantasia</option>
+                    <option value="comedia">Comédia</option>
+                    <option value="drama">Drama</option>
+                    <option value="terror">Terror</option>
+                    <option value="ficcao">Ficção Científica</option>
+                    <option value="esporte">Esporte</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="addMangaCapaFile">Capa do mangá</label>
+                <input type="file" id="addMangaCapaFile" accept="image/*" required>
             </div>
             <div class="form-group">
                 <label for="addMangaPdfFile">Mangá em PDF (capítulo ou obra completa)</label>
@@ -88,6 +176,47 @@
             <button type="submit" id="btnSubmitManga" class="btn-modal btn-submit">Enviar e publicar</button>
         </form>
         <button id="btnFecharAddManga" class="btn-modal btn-secondary">Cancelar</button>
+    </div>
+</div>
+
+<!-- MODAL CONTA DE USUÁRIO -->
+<div id="contaModal" class="modal">
+    <div class="modal-content modal-form">
+        <div id="loginForm">
+            <h3>Entrar na sua conta</h3>
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="loginSenha">Senha</label>
+                <input type="password" id="loginSenha" placeholder="Sua senha" required>
+            </div>
+            <button type="button" id="btnLogin" class="btn-modal btn-submit">Entrar</button>
+            <p id="loginMsg" class="form-msg"></p>
+            <p class="modal-desc">Não tem conta? <a href="#" id="linkParaCadastro">Cadastre-se</a></p>
+        </div>
+        
+        <div id="cadastroForm" style="display: none;">
+            <h3>Criar nova conta</h3>
+            <div class="form-group">
+                <label for="cadNome">Nome</label>
+                <input type="text" id="cadNome" placeholder="Seu nome" required>
+            </div>
+            <div class="form-group">
+                <label for="cadEmail">Email</label>
+                <input type="email" id="cadEmail" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="cadSenha">Senha</label>
+                <input type="password" id="cadSenha" placeholder="Crie uma senha" required>
+            </div>
+            <button type="button" id="btnCadastrar" class="btn-modal btn-submit">Cadastrar</button>
+            <p id="cadMsg" class="form-msg"></p>
+            <p class="modal-desc">Já tem conta? <a href="#" id="linkParaLogin">Faça login</a></p>
+        </div>
+        
+        <button id="btnFecharConta" class="btn-modal btn-secondary">Fechar</button>
     </div>
 </div>
 

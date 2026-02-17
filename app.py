@@ -3,6 +3,7 @@ import json
 import os
 import re
 import uuid
+import hashlib
 from datetime import datetime
 from flask import Flask, send_from_directory, request, jsonify
 from werkzeug.utils import secure_filename
@@ -27,13 +28,18 @@ def slug(nome):
     return s or "manga"
 
 
+def hash_senha(senha):
+    """Gera hash da senha usando SHA-256."""
+    return hashlib.sha256(senha.encode()).hexdigest()
+
+
 def ler_dados():
     """Carrega mangás, capítulos e reações do ficheiro JSON."""
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             dados = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        dados = {"mangas": [], "capitulos": [], "reacoes": {}}
+        dados = {"mangas": [], "capitulos": [], "reacoes": {}, "usuarios": []}
     # Garantir que cada mangá tem id
     for m in dados.get("mangas", []):
         if not m.get("id"):
@@ -45,6 +51,82 @@ def guardar_dados(dados):
     """Guarda dados no ficheiro JSON."""
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(dados, f, ensure_ascii=False, indent=2)
+
+
+# ---------- API Usuários ----------
+
+@app.route("/api/usuarios/cadastrar", methods=["POST"])
+def api_cadastrar_usuario():
+    """Cadastra novo usuário."""
+    body = request.get_json() or {}
+    nome = (body.get("nome") or "").strip()
+    email = (body.get("email") or "").strip()
+    senha = (body.get("senha") or "").strip()
+    
+    if not nome or not email or not senha:
+        return jsonify({"erro": "Faltam nome, email ou senha."}), 400
+    
+    if len(senha) < 4:
+        return jsonify({"erro": "A senha deve ter pelo menos 4 caracteres."}), 400
+    
+    dados = ler_dados()
+    usuarios = dados.get("usuarios", [])
+    
+    # Verificar se email já existe
+    for u in usuarios:
+        if u.get("email") == email:
+            return jsonify({"erro": "Este email já está cadastrado."}), 400
+    
+    # Criar novo usuário
+    novo_usuario = {
+        "id": str(uuid.uuid4()),
+        "nome": nome[:80],
+        "email": email.lower(),
+        "senha": hash_senha(senha),
+        "data_cadastro": datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+    }
+    
+    usuarios.append(novo_usuario)
+    dados["usuarios"] = usuarios
+    guardar_dados(dados)
+    
+    # Retornar usuário sem senha
+    return jsonify({
+        "ok": True,
+        "usuario": {
+            "id": novo_usuario["id"],
+            "nome": novo_usuario["nome"],
+            "email": novo_usuario["email"]
+        }
+    })
+
+
+@app.route("/api/usuarios/login", methods=["POST"])
+def api_login():
+    """Autentica usuário."""
+    body = request.get_json() or {}
+    email = (body.get("email") or "").strip().lower()
+    senha = (body.get("senha") or "").strip()
+    
+    if not email or not senha:
+        return jsonify({"erro": "Faltam email ou senha."}), 400
+    
+    dados = ler_dados()
+    usuarios = dados.get("usuarios", [])
+    
+    senha_hash = hash_senha(senha)
+    for u in usuarios:
+        if u.get("email") == email and u.get("senha") == senha_hash:
+            return jsonify({
+                "ok": True,
+                "usuario": {
+                    "id": u["id"],
+                    "nome": u["nome"],
+                    "email": u["email"]
+                }
+            })
+    
+    return jsonify({"erro": "Email ou senha incorretos."}), 401
 
 
 # ---------- API Mangás ----------
@@ -72,24 +154,34 @@ def api_mangas():
 @app.route("/api/mangas", methods=["POST"])
 def api_add_manga():
     """Adiciona mangá: JSON (nome + capa URL) ou multipart (nome + ficheiro capa + ficheiro PDF)."""
+    # Verificar se usuário está logado (em produção, usar token/session)
+    # Por enquanto, vamos permitir mas registrar o usuário se disponível
+    
     dados = ler_dados()
     nome = ""
     capa = ""
     pdf_path = ""
     titulo_capitulo = "Capítulo 01"
+    usuario_id = None
 
     if request.content_type and "multipart/form-data" in request.content_type:
         nome = (request.form.get("nome") or "").strip()
+        genero = (request.form.get("genero") or "").strip()
         f_capa = request.files.get("capa")
         f_pdf = request.files.get("pdf")
+        usuario_id = request.form.get("usuario_id")  # ID do usuário que está adicionando
+        
         if not nome:
             return jsonify({"erro": "Falta o nome do mangá."}), 400
+        if not genero:
+            return jsonify({"erro": "Selecione o gênero do mangá."}), 400
         if not f_capa or not f_capa.filename:
-            return jsonify({"erro": "Escolhe uma imagem de capa."}), 400
+            return jsonify({"erro": "Escolha uma imagem de capa."}), 400
         if not f_pdf or not f_pdf.filename:
-            return jsonify({"erro": "Escolhe o PDF do mangá/capítulo."}), 400
+            return jsonify({"erro": "Escolha o PDF do mangá/capítulo."}), 400
         if f_pdf.content_type != ALLOWED_PDF:
             return jsonify({"erro": "O ficheiro do mangá tem de ser PDF."}), 400
+        
         mid = slug(nome)
         suf = uuid.uuid4().hex[:8]
         ext_capa = os.path.splitext(secure_filename(f_capa.filename))[1] or ".jpg"
@@ -104,6 +196,7 @@ def api_add_manga():
             f_pdf.save(path_pdf)
         except Exception as e:
             return jsonify({"erro": "Erro ao guardar ficheiros: " + str(e)}), 500
+        
         capa = f"/uploads/capas/{fn_capa}"
         pdf_path = f"/uploads/pdf/{fn_pdf}"
         titulo_capitulo = request.form.get("titulo_capitulo", "").strip() or "Capítulo 01"
@@ -111,19 +204,43 @@ def api_add_manga():
         body = request.get_json() or {}
         nome = (body.get("nome") or "").strip()
         capa = (body.get("capa") or "").strip()
+        genero = (body.get("genero") or "").strip()
+        usuario_id = body.get("usuario_id")
+        
         if not nome or not capa:
             return jsonify({"erro": "Faltam nome ou capa."}), 400
+        if not genero:
+            return jsonify({"erro": "Selecione o gênero do mangá."}), 400
         mid = slug(nome)
 
     mid = mid or slug(nome)
-    dados.setdefault("mangas", []).append({"id": mid, "nome": nome, "capa": capa})
+    
+    # Criar objeto do mangá com informações do usuário
+    manga_data = {
+        "id": mid,
+        "nome": nome,
+        "genero": genero,
+        "capa": capa,
+        "usuario_id": usuario_id,
+        "data_adicao": datetime.utcnow().strftime("%Y-%m-%d %H:%M"),
+        "avaliacao_media": 0.0,
+        "avaliacoes": [],
+        "visualizacoes": 0
+    }
+    
+    dados.setdefault("mangas", []).append(manga_data)
     dados.setdefault("reacoes", {})[mid] = {"likes": 0, "dislikes": 0, "comments": []}
+    
     if pdf_path:
         dados.setdefault("capitulos", []).append({
-            "n": titulo_capitulo, "l": pdf_path, "capa": capa
+            "n": titulo_capitulo, 
+            "l": pdf_path, 
+            "capa": capa,
+            "manga_id": mid
         })
+    
     guardar_dados(dados)
-    return jsonify({"ok": True, "mangas": dados["mangas"]})
+    return jsonify({"ok": True, "mangas": dados["mangas"], "manga_adicionado": manga_data})
 
 
 # ---------- API Capítulos ----------
@@ -152,7 +269,98 @@ def api_add_capitulo():
 
 # ---------- API Reações (like / dislike / comentários) ----------
 
-@app.route("/api/reacoes/<manga_id>", methods=["GET"])
+@app.route("/api/reacoes", methods=["GET"])
+def api_get_todas_reacoes():
+    """Devolve todas as reações para estatísticas."""
+    dados = ler_dados()
+    return jsonify(dados.get("reacoes", {}))
+
+@app.route("/api/reacoes/<manga_id>/avaliar", methods=["POST"])
+def api_avaliar_manga(manga_id):
+    """Adiciona avaliação com estrelas (1-5)."""
+    dados = ler_dados()
+    
+    # Verificar se usuário está logado (em produção, usar token/session)
+    # Por enquanto, vamos permitir mas registrar a avaliação
+    
+    try:
+        req_data = request.get_json() or {}
+        avaliacao = req_data.get("avaliacao")
+        usuario_id = req_data.get("usuario_id")
+        
+        if not avaliacao or avaliacao < 1 or avaliacao > 5:
+            return jsonify({"erro": "Avaliação deve ser entre 1 e 5 estrelas."}), 400
+        
+        # Encontrar o mangá
+        mangas = dados.get("mangas", [])
+        manga_encontrado = None
+        
+        for manga in mangas:
+            if manga.get("id") == manga_id:
+                manga_encontrado = manga
+                break
+        
+        if not manga_encontrado:
+            return jsonify({"erro": "Mangá não encontrado."}), 404
+        
+        # Inicializar campos se não existirem
+        if "avaliacoes" not in manga_encontrado:
+            manga_encontrado["avaliacoes"] = []
+        if "avaliacao_media" not in manga_encontrado:
+            manga_encontrado["avaliacao_media"] = 0.0
+        
+        # Adicionar avaliação
+        manga_encontrado["avaliacoes"].append({
+            "avaliacao": avaliacao,
+            "usuario_id": usuario_id,
+            "data": datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+        })
+        
+        # Calcular média
+        total_avaliacoes = len(manga_encontrado["avaliacoes"])
+        soma_avaliacoes = sum(a["avaliacao"] for a in manga_encontrado["avaliacoes"])
+        manga_encontrado["avaliacao_media"] = round(soma_avaliacoes / total_avaliacoes, 1)
+        
+        guardar_dados(dados)
+        return jsonify({
+            "ok": True, 
+            "avaliacao_media": manga_encontrado["avaliacao_media"],
+            "total_avaliacoes": total_avaliacoes
+        })
+        
+    except Exception as e:
+        return jsonify({"erro": "Erro ao avaliar mangá: " + str(e)}), 500
+
+@app.route("/api/reacoes/<manga_id>/visualizar", methods=["POST"])
+def api_visualizar_manga(manga_id):
+    """Incrementa contador de visualizações."""
+    dados = ler_dados()
+    
+    # Encontrar o mangá
+    mangas = dados.get("mangas", [])
+    manga_encontrado = None
+    
+    for manga in mangas:
+        if manga.get("id") == manga_id:
+            manga_encontrado = manga
+            break
+    
+    if not manga_encontrado:
+        return jsonify({"erro": "Mangá não encontrado."}), 404
+    
+    # Incrementar visualizações
+    if "visualizacoes" not in manga_encontrado:
+        manga_encontrado["visualizacoes"] = 0
+    
+    manga_encontrado["visualizacoes"] += 1
+    
+    guardar_dados(dados)
+    return jsonify({
+        "ok": True, 
+        "visualizacoes": manga_encontrado["visualizacoes"]
+    })
+
+@app.route("/api/reacoes/<manga_id>", methods=["GET"])))
 def api_get_reacoes(manga_id):
     """Devolve likes, dislikes e comentários de um mangá."""
     dados = ler_dados()
