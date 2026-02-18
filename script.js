@@ -110,27 +110,33 @@ function carregarMangas() {
         var card = document.createElement("div");
         card.className = "card";
         card.innerHTML =
+            "<div class='container-info'>" +
             "<img src=\"" + esc(capa) + "\" alt=\"" + nome + "\">" +
             "<h4>" + nome + "</h4>" +
-            "<div class=\"card-reacoes\">" +
-            "<div class=\"avaliacao-container\">" +
-            "<div class=\"estrelas-container\" data-manga-id=\"" + esc(id) + "\">" +
-            "<span class=\"estrela\" data-avaliacao=\"1\">⭐</span>" +
-            "<span class=\"estrela\" data-avaliacao=\"2\">⭐</span>" +
-            "<span class=\"estrela\" data-avaliacao=\"3\">⭐</span>" +
-            "<span class=\"estrela\" data-avaliacao=\"4\">⭐</span>" +
-            "<span class=\"estrela\" data-avaliacao=\"5\">⭐</span>" +
             "</div>" +
-            "<span class=\"avaliacao-numero\">" + avaliacaoMedia + "/5</span>" +
+            "<div class='container-interacao'>" +
+            "<div class='avaliacao-container'>" +
+            "<div class='estrelas-container' data-manga-id=\"" + esc(id) + "\">" +
+            "<span class='estrela' data-avaliacao='1'>⭐</span>" +
+            "<span class='estrela' data-avaliacao='2'>⭐</span>" +
+            "<span class='estrela' data-avaliacao='3'>⭐</span>" +
+            "<span class='estrela' data-avaliacao='4'>⭐</span>" +
+            "<span class='estrela' data-avaliacao='5'>⭐</span>" +
             "</div>" +
-            "<div class=\"reacoes-botoes\">" +
-            "<button type=\"button\" class=\"btn-like\" data-manga-id=\"" + esc(id) + "\" title=\"Gostei\">👍 <span class=\"num\">" + likes + "</span></button>" +
-            "<button type=\"button\" class=\"btn-dislike\" data-manga-id=\"" + esc(id) + "\" title=\"Não gostei\">👎 <span class=\"num\">" + dislikes + "</span></button>" +
-            "<button type=\"button\" class=\"btn-comentarios\" data-manga-id=\"" + esc(id) + "\" data-manga-nome=\"" + nome + "\">💬 Comentários (" + commentsCount + ")</button>" +
-            "<div class=\"visualizacoes\">👁️ " + (m.visualizacoes || 0) + " leituras</div>" +
+            "<span class='avaliacao-numero'>" + avaliacaoMedia + "/5</span>" +
+            "</div>" +
+            "<div class='card-reacoes'>" +
+            "<div class='reacoes-botoes'>" +
+            "<button type='button' class='btn-like' data-manga-id=\"" + esc(id) + "\" title='Gostei'>👍 <span class='num'>" + likes + "</span></button>" +
+            "<button type='button' class='btn-dislike' data-manga-id=\"" + esc(id) + "\" title='Não gostei'>👎 <span class='num'>" + dislikes + "</span></button>" +
+            "<button type='button' class='btn-comentarios' data-manga-id=\"" + esc(id) + "\" data-manga-nome='" + nome + "'>💬 Comentários (" + commentsCount + ")</button>" +
             "</div>" +
             "</div>" +
-            "<button class=\"btn-ler\" onclick=\"abrirCapitulos('" + esc(id) + "')\">Ler</button>";
+            "<div class='visualizacoes'>👁️ " + (m.visualizacoes || 0) + " leituras</div>" +
+            "</div>" +
+            "<div class='container-ler'>" +
+            "<button class='btn-ler' onclick='abrirCapitulos(\"" + esc(id) + "\")'>Ler</button>" +
+            "</div>";
         mangaList.appendChild(card);
     });
     
