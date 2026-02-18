@@ -14,6 +14,7 @@
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Pesquisar mangás..." class="search-input">
             <button id="btnSearch" class="search-btn" onclick="pesquisarComBotao()">🔍</button>
+            <div id="resultadosPesquisa" style="display: none;"></div>
         </div>
         <button id="btnPerfil" class="perfil-btn">👤 Entrar</button>
     </div>
@@ -90,6 +91,46 @@
     <div id="mangaGrid" class="grid"></div>
 </section>
 
+<!-- SEÇÃO RECLAMAÇÃO -->
+<section id="reclamacao" class="reclamacao" style="display: none;">
+    <div class="reclamacao-container">
+        <h2>📝 Faça sua Reclamação</h2>
+        <p class="reclamacao-desc">Tem algum problema ou sugestão? Deixe sua mensagem abaixo!</p>
+        
+        <form id="formReclamacao">
+            <div class="form-group">
+                <label for="reclamacaoNome">Seu nome</label>
+                <input type="text" id="reclamacaoNome" placeholder="Seu nome completo" required>
+            </div>
+            <div class="form-group">
+                <label for="reclamacaoEmail">Seu email</label>
+                <input type="email" id="reclamacaoEmail" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="reclamacaoTipo">Tipo</label>
+                <select id="reclamacaoTipo" required>
+                    <option value="">Selecione...</option>
+                    <option value="bug">Erro no site</option>
+                    <option value="conteudo">Problema com conteúdo</option>
+                    <option value="sugestao">Sugestão</option>
+                    <option value="outro">Outro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="reclamacaoMensagem">Mensagem</label>
+                <textarea id="reclamacaoMensagem" placeholder="Descreva detalhadamente..." rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn-modal btn-submit">Enviar Reclamação</button>
+        </form>
+        
+        <div class="reclamacao-contato">
+            <p>📱 <strong>WhatsApp:</strong> <a href="https://wa.me/244948954142" target="_blank">+244 948 954 142</a></p>
+            <p>📞 <strong>Telefone:</strong> <a href="tel:+244948954142">+244 948 954 142</a></p>
+            <p>✉️ <strong>Email:</strong> <a href="mailto:contato@bedia.netlify.app">contato@bedia.netlify.app</a></p>
+        </div>
+    </div>
+</section>
+
 <!-- SEÇÃO ESTATÍSTICAS (se logado) -->
 <section id="estatisticas" class="estatisticas" style="display: none;">
     <div class="ultimos-header">
@@ -124,7 +165,9 @@
     <a href="#ultimos" class="menu-link">Últimos capítulos</a>
     <a href="#estatisticas" class="menu-link" id="linkEstatisticas" style="display: none;">Minhas Estatísticas</a>
     <a href="#inicio" class="menu-link">Destaques</a>
-    <a href="tel:948954142" class="menu-link menu-link-tel">Contato - 948 954 142</a>
+    <a href="#reclamacao" class="menu-link" id="linkReclamacao">📝 Reclamação</a>
+    <a href="https://wa.me/244948954142" target="_blank" class="menu-link menu-link-whatsapp">📱 WhatsApp</a>
+    <a href="tel:+244948954142" class="menu-link menu-link-tel">Contato - +244 948 954 142</a>
 </div>
 
 <!-- MODAL CAPÍTULOS -->
@@ -183,6 +226,7 @@
 <div id="contaModal" class="modal">
     <div class="modal-content modal-form">
         <div id="loginForm">
+            <button class="fechar-modal" id="btnFecharLogin">✖</button>
             <h3>Entrar na sua conta</h3>
             <div class="form-group">
                 <label for="loginEmail">Email</label>
@@ -198,6 +242,7 @@
         </div>
         
         <div id="cadastroForm" style="display: none;">
+            <button class="fechar-modal" id="btnFecharLogin">✖</button>
             <h3>Criar nova conta</h3>
             <div class="form-group">
                 <label for="cadNome">Nome</label>
@@ -214,6 +259,7 @@
             <button type="button" id="btnCadastrar" class="btn-modal btn-submit">Cadastrar</button>
             <p id="cadMsg" class="form-msg"></p>
             <p class="modal-desc">Já tem conta? <a href="#" id="linkParaLogin">Faça login</a></p>
+            <p class="modal-desc"><a href="#" id="linkParaCadastro">Voltar para cadastro</a></p>
         </div>
         
         <button id="btnFecharConta" class="btn-modal btn-secondary">Fechar</button>
@@ -228,14 +274,21 @@
         <form id="formComment">
             <input type="hidden" id="commentMangaId">
             <div class="form-group">
-                <input type="text" id="commentAutor" placeholder="O teu nome (opcional)">
+                <label for="commentTexto">Seu comentário</label>
+                <textarea id="commentTexto" placeholder="Escreva um comentário..." rows="3" required></textarea>
             </div>
-            <div class="form-group">
-                <textarea id="commentTexto" placeholder="Escreve um comentário..." rows="3" required></textarea>
-            </div>
-            <button type="submit" class="btn-modal btn-submit">Enviar comentário</button>
+            <button type="submit" class="btn-modal btn-submit">Enviar Comentário</button>
         </form>
         <button id="btnFecharComments" class="btn-modal btn-secondary">Fechar</button>
+    </div>
+</div>
+
+<!-- MODAL DE SELEÇÃO DE MANGÁS -->
+<div id="modalManga" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-manga-conteudo">
+            <!-- Conteúdo será inserido dinamicamente -->
+        </div>
     </div>
 </div>
 
