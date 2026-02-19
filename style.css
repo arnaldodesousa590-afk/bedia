@@ -331,6 +331,13 @@ body{
     transform:rotate(90deg);
 }
 
+/* ANIMAÇÃO DAS ESTRELAS */
+@keyframes estrelaPulse{
+    0%{ transform:scale(1); }
+    50%{ transform:scale(1.3); }
+    100%{ transform:scale(1.1); }
+}
+
 /* ESTATÍSTICAS */
 .estatisticas{
     padding:20px;
@@ -377,9 +384,12 @@ body{
 }
 
 .estrela.ativa{
-    opacity:1;
-    filter:grayscale(0%);
-    transform:scale(1.1);
+    opacity:1 !important;
+    filter:grayscale(0%) !important;
+    transform:scale(1.1) !important;
+    color:#FFD700 !important;
+    text-shadow:0 0 10px rgba(255,215,0,0.5) !important;
+    animation:estrelaPulse 0.3s ease !important;
 }
 
 .estrela:hover{
@@ -419,12 +429,12 @@ body{
     display:flex !important;
     flex-direction:column !important;
     width:100% !important;
-    min-height:40px !important;
+    min-height:80px !important;
     margin-bottom:5px !important;
     position:relative !important;
     clear:both !important;
     align-items:flex-start !important;
-    gap:5px !important;
+    gap:8px !important;
 }
 
 .card-reacoes{
@@ -498,10 +508,12 @@ body{
     display:flex !important;
     justify-content:flex-start !important;
     width:100% !important;
-    margin:5px 0 !important;
+    margin:8px 0 !important;
     position:relative !important;
     clear:both !important;
     align-items:center !important;
+    min-height:40px !important;
+    gap:8px !important;
 }
 
 .card button.btn-ler{
@@ -528,15 +540,22 @@ body{
 }
 
 @media (max-width: 768px) {
+    .container-interacao{
+        min-height:100px !important;
+        gap:10px !important;
+    }
+    
+    .container-ler{
+        min-height:50px !important;
+        gap:10px !important;
+        margin:10px 0 !important;
+    }
+    
     .card button.btn-ler {
-        padding:4px 8px !important;
-        font-size:10px !important;
-        margin:5px 0 !important;
-        display:inline-block !important;
         padding:6px 10px !important;
         font-size:11px !important;
-        margin:15px 0 !important;
-        display:block !important;
+        margin:8px 0 !important;
+        display:inline-block !important;
         visibility:visible !important;
     }
 }

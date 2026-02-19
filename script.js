@@ -3,6 +3,35 @@ var mangas = [];
 var capitulos = [];
 var usuarioLogado = null;
 
+// Sistema de persistência de sessão
+function salvarSessao() {
+    if (usuarioLogado) {
+        localStorage.setItem('bedia_usuario_logado', JSON.stringify(usuarioLogado));
+    } else {
+        localStorage.removeItem('bedia_usuario_logado');
+    }
+}
+
+function carregarSessao() {
+    var sessao = localStorage.getItem('bedia_usuario_logado');
+    if (sessao) {
+        usuarioLogado = JSON.parse(sessao);
+        var btnPerfil = document.getElementById('btnPerfil');
+        if (btnPerfil) {
+            btnPerfil.textContent = '👤 ' + usuarioLogado.nome;
+        }
+    }
+}
+
+function fazerLogout() {
+    usuarioLogado = null;
+    salvarSessao();
+    var btnPerfil = document.getElementById('btnPerfil');
+    if (btnPerfil) {
+        btnPerfil.textContent = '👤 Entrar';
+    }
+}
+
 // Elementos do DOM
 var modal, mangaList, chapterListModal, addMangaModal, commentsModal, commentsList;
 
@@ -530,6 +559,9 @@ function renderComentariosLista(comments) {
 
 // Inicialização quando o DOM estiver pronto
 document.addEventListener("DOMContentLoaded", function() {
+    // Carregar sessão persistente
+    carregarSessao();
+    
     // Esperar um pouco para garantir que todos os elementos existam
     setTimeout(function() {
         // Obter elementos do DOM
@@ -567,8 +599,16 @@ document.addEventListener("DOMContentLoaded", function() {
         var btnPerfil = document.getElementById("btnPerfil");
         if (btnPerfil) {
             btnPerfil.onclick = function() {
-                var contaModal = document.getElementById("contaModal");
-                if (contaModal) contaModal.style.display = "flex";
+                if (usuarioLogado) {
+                    // Usuário logado - mostrar opções de perfil
+                    if (confirm("Deseja sair da sua conta?")) {
+                        fazerLogout();
+                    }
+                } else {
+                    // Usuário não logado - abrir login
+                    var contaModal = document.getElementById("contaModal");
+                    if (contaModal) contaModal.style.display = "flex";
+                }
             };
         }
         
@@ -603,6 +643,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 if (usuario) {
                     usuarioLogado = usuario;
+                    salvarSessao(); // Salvar sessão no localStorage
                     btnPerfil.textContent = "👤 " + usuario.nome;
                     var contaModal = document.getElementById("contaModal");
                     if (contaModal) contaModal.style.display = "none";
@@ -1085,14 +1126,18 @@ document.addEventListener("DOMContentLoaded", function() {
                     return;
                 }
                 
-                // Abrir modal de adicionar mangá
-                if (addMangaModal) {
-                    addMangaModal.style.display = "flex";
-                }
+                if (addMangaModal) addMangaModal.style.display = "flex";
             };
         }
         
-        // Formulário de Adicionar Mangá
+        // Botão Cancelar Adicionar Mangá
+        var btnFecharAddManga = document.getElementById("btnFecharAddManga");
+        if (btnFecharAddManga) {
+            btnFecharAddManga.onclick = function() {
+                if (addMangaModal) addMangaModal.style.display = "none";
+            };
+        }
+        
         var formAddManga = document.getElementById("formAddManga");
         if (formAddManga) {
             formAddManga.onsubmit = function(e) {
