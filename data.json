@@ -1,6 +1,6 @@
 {
   "mangas": [
-    { "id": "20-sobre-love", "nome": "20 Sobre Love", "genero": "romance", "capa": "capa.jpeg", "usuario_id": null, "data_adicao": "2024-01-01 00:00", "avaliacao_media": 0.0, "avaliacoes": [], "visualizacoes": 0 }
+    { "id": "20-sobre-love", "nome": "20 Sobre Love", "genero": "romance", "capa": "capa.jpeg", "usuario_id": null, "data_adicao": "2024-01-01 00:00", "avaliacao_media": 0.0, "avaliacoes": [], "visualizacoes": 0, "autor": "Bédia Quadrinho", "sinopse": "Numa dividida guerra entre uma professora e uma aluna, a vitória vai obviamente para a professora. Mas uma grande reviravolta ocorre quando a aluna é obrigada a levar o encarregado por causa da sua queda de notas e indisciplina. Essa reviravolta milagrosa é a paixão da Professora pelo pai viúvo da nossa protagonista que ganha vantagem e aproveita a situação com a proposta: Eu te ajudo com o meu pai, mas você me torna uma das 5 melhores em matemática." }
   ],
   "capitulos": [
     { "n": "Capítulo 01", "l": "20 SOBRE LOVE - 01.pdf", "capa": "capa.jpeg", "manga_id": "20-sobre-love" },

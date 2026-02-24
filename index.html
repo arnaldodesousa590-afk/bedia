@@ -231,16 +231,29 @@
             <button class="fechar-modal" id="btnFecharLogin">✖</button>
             <h3>Entrar na sua conta</h3>
             <div class="form-group">
-                <label for="loginEmail">Email</label>
+                <label for="loginEmail">E-mail</label>
                 <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+                <span id="emailError" class="error-message"></span>
             </div>
             <div class="form-group">
                 <label for="loginSenha">Senha</label>
-                <input type="password" id="loginSenha" placeholder="Sua senha" required>
+                <div class="senha-container">
+                    <input type="password" id="loginSenha" placeholder="Sua senha" required>
+                    <span class="senha-toggle" onclick="toggleSenha('loginSenha')">👁️</span>
+                </div>
+                <span id="senhaError" class="error-message"></span>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                    <input type="checkbox" id="loginLembrar" style="accent-color:#ff0033;">
+                    <label for="loginLembrar" style="opacity:0.85;">Lembrar-me neste dispositivo</label>
+                </div>
+                <div id="capsLockHint" style="display:none;color:#ff6b6b;font-size:12px;margin-top:6px;">Caps Lock está ativo</div>
             </div>
-            <button type="button" id="btnLogin" class="btn-modal btn-submit">Entrar</button>
+            <button type="button" id="btnLogin" class="btn-modal btn-submit"><span class="btn-text">Entrar</span></button>
             <p id="loginMsg" class="form-msg"></p>
             <p class="modal-desc">Não tem conta? <a href="#" id="linkParaCadastro">Cadastre-se</a></p>
+            <div class="botoes-sociais">
+                <button type="button" class="btn-social btn-google" onclick="loginComGoogle()"><span class="btn-text">🔍 Google</span></button>
+            </div>
         </div>
         
         <div id="cadastroForm" style="display: none;">
@@ -257,6 +270,10 @@
             <div class="form-group">
                 <label for="cadSenha">Senha</label>
                 <input type="password" id="cadSenha" placeholder="Crie uma senha" required>
+                <div id="cadStrength" style="height:6px;background:#333;border-radius:4px;margin-top:6px;overflow:hidden;">
+                    <div id="cadStrengthBar" style="height:100%;width:0;background:#ff6b6b;transition:width .2s,background .2s;"></div>
+                </div>
+                <small id="cadStrengthText" style="display:block;margin-top:6px;opacity:0.85;">Força da senha: —</small>
             </div>
             <button type="button" id="btnCadastrar" class="btn-modal btn-submit">Cadastrar</button>
             <p id="cadMsg" class="form-msg"></p>
@@ -271,7 +288,7 @@
 <!-- MODAL COMENTÁRIOS -->
 <div id="commentsModal" class="modal">
     <div class="modal-content modal-form">
-        <h3 id="commentsModalTitulo">Comentários</h3>
+        <h3 id="commentsModalTitulo">Comentários de <span id="commentMangaNome"></span></h3>
         <div id="commentsList"></div>
         <form id="formComment">
             <input type="hidden" id="commentMangaId">
@@ -289,11 +306,61 @@
 <div id="modalManga" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-manga-conteudo">
-            <!-- Conteúdo será inserido dinamicamente -->
+            <!-- ESTRUTURA FIXA COM BOTÃO DETALHES -->
+            <button class="fechar-modal-manga" onclick="fecharModalManga()">✖</button>
+            <img id="modal-manga-capa" src="" alt="" class="modal-manga-capa">
+            
+            <!-- BLOCO SUPERIOR: INFORMAÇÕES -->
+            <div class="modal-manga-info-bloco" id="info-bloco">
+                <h2 id="modal-manga-titulo"></h2>
+                <div class="modal-manga-autor">
+                    <p class="autor-label">Escrito por:</p>
+                    <h3 class="autor-nome">Bédia Quadrinho</h3>
+                    <button class="like-btn" id="modal-like-btn">🔥</button>
+                </div>
+                <p class="modal-manga-genero" id="modal-manga-genero"></p>
+                
+                <!-- BLOCO DE DETALHES (OCULTO POR PADRÃO) -->
+                <div class="modal-manga-detalhes" id="detalhes-bloco" style="display: none;">
+                    <div class="modal-manga-sinopse">
+                        <h3>Sinopse</h3>
+                        <p class="sinopse-texto">Numa divertida guerra entre uma professora e uma aluna, a vitória vai obviamente para a professora. Mas uma grande reviravolta ocorre quando a aluna é obrigada a levar o encarregado por causa da sua queda de notas e indisciplina. Essa reviravolta milagrosa é a paixão da Professora pelo pai viúvo da nossa protagonista que ganha vantagem e aproveita a situação com a proposta: Eu te ajudo com o meu pai, mas você me torna uma das 5 melhores em matemática.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BLOCO INFERIOR: CAPÍTULOS -->
+            <div class="modal-manga-capitulos-bloco" id="capitulos-bloco">
+                <h3>Capítulos</h3>
+                <div id="capitulos-container">
+                    <p style="color: white;">Carregando capítulos...</p>
+                </div>
+            </div>
+            
+            <!-- BOTÕES DE AÇÃO COM BOTÃO DETALHES -->
+            <div class="modal-manga-acoes">
+                <button id="btn-detalhes" class="btn-detalhes" onclick="toggleDetalhes()" style="display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 9999 !important; background: rgba(40, 40, 40, 0.8) !important; backdrop-filter: blur(10px) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; color: #ffffff !important; font-size: 14px !important; font-weight: 500 !important; padding: 12px 20px !important; border-radius: 8px !important; cursor: pointer !important; text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;">📋 DETALHES</button>
+                
+                <!-- TEXTO DA JUL E AUTOR -->
+                <div id="texto-detalhes" style="display: none; margin: 10px 0; padding: 15px; background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(10px); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <p style="color: #ffffff !important; font-weight: bold; margin-bottom: 10px;">Autor: Bédia Quadrinho</p>
+                    <p style="color: #ffffff !important; line-height: 1.6; text-align: justify;">Numa divertida guerra entre uma professora e uma aluna, a vitória vai obviamente para a professora. Mas uma grande reviravolta ocorre quando a aluna é obrigada a levar o encarregado por causa da sua queda de notas e indisciplina. Essa reviravolta milagrosa é a paixão da Professora pelo pai viúvo da nossa protagonista que ganha vantagem e aproveita a situação com a proposta: Eu te ajudo com o meu pai, mas você me torna uma das 5 melhores em matemática.</p>
+                </div>
+                
+                <button id="btn-modal-ler" class="btn-modal-ler" onclick="abrirCapitulos()">📖 LER</button>
+                <button class="btn-modal-fechar" onclick="fecharModalManga()">Fechar</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="script.js"></script>
+
+
+
+
+
+
+
 </body>
 </html>
